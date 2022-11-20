@@ -1,5 +1,6 @@
 import { Box, Flex, Text, Center } from "@chakra-ui/react";
 import Avatar from "react-avatar";
+import TodoIcon from "/todo-icon.svg";
 
 export default function Navbar() {
   return (
@@ -11,7 +12,7 @@ export default function Navbar() {
         justifyContent="space-between"
       >
         <Center>
-          <img src="/todo-icon.svg" alt="Todo Icon" width="30" height="30" />
+          <img src={TodoIcon} alt="Todo Icon" width="30" height="30" />
           <Text as="h1" marginX="5px">
             Collaborative Todo List
           </Text>

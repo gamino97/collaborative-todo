@@ -7,7 +7,7 @@ import {
   TabPanel,
   Container,
 } from "@chakra-ui/react";
-import MyTasks from "components/MyTasks";
+import MyLocalTasks from "components/MyLocalTasks";
 
 export default function Home() {
   return (
@@ -23,7 +23,7 @@ export default function Home() {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <MyTasks />
+              <MyLocalTasks />
             </TabPanel>
             <TabPanel>
               <p>two!</p>

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --base=/static/",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -14,10 +14,14 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "framer-motion": "^7.6.7",
+    "localforage": "1.10.0",
+    "match-sorter": "6.3.1",
     "react": "^18.2.0",
     "react-avatar": "5.0.3",
     "react-dom": "^18.2.0",
-    "react-hook-form": "7.39.4"
+    "react-hook-form": "7.39.4",
+    "react-router-dom": "6.4.3",
+    "sort-by-typescript": "^1.2.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
