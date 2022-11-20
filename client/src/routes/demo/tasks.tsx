@@ -3,8 +3,10 @@ import { useEffect, useState, useTransition } from "react";
 import type { Task } from "lib/tasks/types";
 import { FormValues } from "constants/FormValues/CreateTask";
 import TasksSection from "components/TasksSection";
+import { TabPanel } from "@chakra-ui/react";
+import BaseTabsLayout from "components/BaseTabsLayout";
 
-function MyLocalTasks() {
+function DemoTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [, startTransition] = useTransition();
   const onSubmit = async (data: FormValues) => {
@@ -22,7 +24,16 @@ function MyLocalTasks() {
     }
     getAsyncTasks();
   }, []);
-  return <TasksSection onCreateTask={onSubmit} tasks={tasks} />;
+  return (
+    <BaseTabsLayout>
+      <TabPanel>
+        <TasksSection onCreateTask={onSubmit} tasks={tasks} />
+      </TabPanel>
+      <TabPanel>
+        <p>two!</p>
+      </TabPanel>
+    </BaseTabsLayout>
+  );
 }
 
-export default MyLocalTasks;
+export default DemoTasks;
