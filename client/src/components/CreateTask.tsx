@@ -6,6 +6,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
+  Flex,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
@@ -18,6 +19,7 @@ import {
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { FormValues } from "constants/FormValues/CreateTask";
+import TaskForm from "components/TaskForm";
 
 interface Props {
   onCreateTask: (data: FormValues) => Promise<void>;
@@ -25,16 +27,11 @@ interface Props {
 
 function CreateTask({ onCreateTask }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const methods = useForm<FormValues>();
   const {
-    register,
-    handleSubmit,
+    formState: { isSubmitting },
     reset,
-    formState: { errors },
-  } = useForm<FormValues>();
-  // const closeTaskCreation = () => {
-  //   onClose();
-  //   reset();
-  // };
+  } = methods;
   useEffect(() => {
     const keyPressListener = (event: KeyboardEvent) => {
       if (event.key === "n" && event.altKey && !isOpen) {
@@ -58,39 +55,23 @@ function CreateTask({ onCreateTask }: Props) {
         <ModalContent>
           <ModalHeader>Task Creation</ModalHeader>
           <ModalCloseButton />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
-              <FormControl isRequired>
-                <FormLabel htmlFor="title">Title</FormLabel>
-                <Input
-                  id="title"
-                  placeholder="Title"
-                  {...register("title", { required: "Title is required" })}
-                  autoFocus
-                />
-
-                <FormErrorMessage>
-                  {errors.title != null && errors.title.message}
-                </FormErrorMessage>
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel htmlFor="content">Content</FormLabel>
-                <Textarea
-                  id="content"
-                  placeholder="Content"
-                  {...register("content")}
-                />
-              </FormControl>
-            </ModalBody>
-            <ModalFooter mt={4}>
-              <Button colorScheme="blue" mr={3} isLoading={false} type="submit">
-                Create Task
-              </Button>
-              <Button variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
-            </ModalFooter>
-          </form>
+          <ModalBody>
+            <TaskForm onSubmit={onSubmit} methods={methods}>
+              <Flex my={4} justifyContent="end">
+                <Button
+                  colorScheme="blue"
+                  mr={3}
+                  isLoading={isSubmitting}
+                  type="submit"
+                >
+                  Create Task
+                </Button>
+                <Button variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+              </Flex>
+            </TaskForm>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </Box>

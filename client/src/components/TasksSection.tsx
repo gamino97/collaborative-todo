@@ -1,14 +1,17 @@
-import { Box, Stack, Skeleton } from "@chakra-ui/react";
+import { Box, Skeleton, Stack } from "@chakra-ui/react";
 import { CreateTask } from "components/CreateTask";
-import type { Task } from "lib/tasks/types";
+import { Task, onDeleteTask, onUpdateTask } from "lib/tasks/types";
 import { lazy, Suspense } from "react";
+import { FormValues } from "constants/FormValues/CreateTask";
+
 const NoTask = lazy(() => import("components/NoTask"));
 const TaskList = lazy(() => import("components/TaskList"));
-import { FormValues } from "constants/FormValues/CreateTask";
 
 interface Props {
   onCreateTask: (data: FormValues) => Promise<void>;
   tasks: Task[];
+  onDeleteTask: onDeleteTask;
+  onUpdateTask: onUpdateTask;
 }
 
 function LoadingTaskSection() {
@@ -23,13 +26,26 @@ function LoadingTaskSection() {
   );
 }
 
-const TasksSection = ({ onCreateTask, tasks }: Props) => {
+const TasksSection = ({
+  onCreateTask,
+  tasks,
+  onDeleteTask,
+  onUpdateTask,
+}: Props) => {
   return (
     <Box>
       <CreateTask onCreateTask={onCreateTask} />
       <Box mt={4}>
         <Suspense fallback={<LoadingTaskSection />}>
-          {tasks.length === 0 ? <NoTask /> : <TaskList tasks={tasks} />}
+          {tasks.length === 0 ? (
+            <NoTask />
+          ) : (
+            <TaskList
+              tasks={tasks}
+              onDeleteTask={onDeleteTask}
+              onUpdateTask={onUpdateTask}
+            />
+          )}
         </Suspense>
       </Box>
     </Box>
