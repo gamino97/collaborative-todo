@@ -1,0 +1,17 @@
+#+title: README
+
+* Database
+** Init database
+#+begin_src bash
+flask --app app.main db init
+#+end_src
+
+** Make migrations
+#+begin_src bash
+flask --app app.main db migrate -m "My migration message"
+#+end_src
+
+** Apply database changes
+#+begin_src bash
+flask --app app.main db upgrade
+#+end_src

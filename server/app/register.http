@@ -1,0 +1,12 @@
+GET http://dev.localhost:5000/api/getcsrf
+Accept: application/json
+
+###
+POST http://dev.localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "email1@example.com"
+}
+
+###
