@@ -35,7 +35,12 @@ export async function createTask(isDemo: boolean, data: FormValues) {
 export async function deleteTask(isDemo: boolean, task: Task) {
   const currentTasks = await getTasks(isDemo);
   const newTasks = currentTasks.filter((t) => t.id !== task.id);
-  const { set } = await import("lib/tasks/demo");
+  let set;
+  if (isDemo) {
+    ({ set } = await import("lib/tasks/network"));
+  } else {
+    ({ set } = await import("lib/tasks/demo"));
+  }
   await set(newTasks);
   return newTasks;
 }

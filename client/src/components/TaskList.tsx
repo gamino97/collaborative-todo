@@ -92,24 +92,29 @@ export default function TaskList({ tasks, onDeleteTask, onUpdateTask }: Props) {
           return onDeleteTask(task);
         };
         return (
-          <ListItem key={task.id} p={4} bg="gray.50">
-            <Flex alignItems="start" justifyContent="space-between">
-              <Box as="section">
-                <Heading size="md" as="h5">
-                  {task.title}
-                </Heading>
-                {task.content && <Text>{task.content}</Text>}
-              </Box>
-              <Box>
-                <UpdateTask task={task} onUpdateTask={onUpdateTask} />
-                <IconButton
-                  colorScheme="red"
-                  aria-label={`Delete ${task.title}`}
-                  icon={<DeleteIcon />}
-                  onClick={handleDeleteClick}
-                />
-              </Box>
-            </Flex>
+          <ListItem
+            key={task.id}
+            p={4}
+            bg="gray.50"
+            display="flex"
+            alignItems="start"
+            justifyContent="space-between"
+          >
+            <Box as="section">
+              <Heading size="md" as="h5">
+                {task.title}
+              </Heading>
+              {task.content && <Text>{task.content}</Text>}
+            </Box>
+            <Box as="section">
+              <UpdateTask task={task} onUpdateTask={onUpdateTask} />
+              <IconButton
+                colorScheme="red"
+                aria-label={`Delete ${task.title}`}
+                icon={<DeleteIcon />}
+                onClick={handleDeleteClick}
+              />
+            </Box>
           </ListItem>
         );
       })}
