@@ -2,6 +2,7 @@ import localforage from "localforage";
 import apiClient from "lib/apiClient";
 
 async function requestCsrf() {
+  console.info("Requesting CSRF token to the backend");
   const res = await apiClient.get("/getcsrf", { withCredentials: true });
   const csrf = res.headers["x-csrftoken"];
   if (csrf) return await localforage.setItem<string>("csrftoken", csrf);

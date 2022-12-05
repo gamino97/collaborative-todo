@@ -2,21 +2,21 @@ import AuthLayout from "components/AuthLayout";
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Input,
   Link,
-  Stack,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import apiClient from "lib/apiClient";
-import { Link as ReachLink, redirect, useNavigate } from "react-router-dom";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { AxiosError, isAxiosError } from "axios";
+import { useUser } from "services/user";
+import { useEffect } from "react";
 
 interface FormValues {
   email: string;
@@ -32,11 +32,13 @@ function Register() {
     setError,
   } = useForm<FormValues>();
   const navigate = useNavigate();
+  const { isLoggedIn } = useUser();
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      const res = await apiClient.post("/auth/register", { ...data });
+      await apiClient.post("/auth/register", { ...data });
       return navigate("/demo/tasks");
     } catch (e) {
+      console.error(e);
       if (isAxiosError(e)) {
         const err = e as AxiosError;
         Object.entries(err.response.data).forEach(([field, message]) => {
@@ -51,6 +53,12 @@ function Register() {
       }
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
   return (
     <AuthLayout>
       <Box textAlign="center">

@@ -23,10 +23,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error?.response?.status === 400 && originalRequest.url === "/getcsrf") {
+    if (error?.response?.status === 401 && originalRequest.url === "/getcsrf") {
       await clearCsrf();
       return Promise.reject(error);
-    } else if (error?.response?.status === 400 && !originalRequest._retry) {
+    } else if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       await requestCsrf();
       const verification = await getCsrf();

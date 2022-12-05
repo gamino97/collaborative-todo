@@ -4,7 +4,7 @@ import { useUser } from "services/user";
 import apiClient from "lib/apiClient";
 
 export const AuthOutlet = () => {
-  const { isLoading, error, data } = useUser();
+  const { isLoading, error } = useUser();
   if (isLoading) return <Fallback />;
   if (error instanceof Error) return <span>Error: {error.message}</span>;
   const handleClick = async () => {

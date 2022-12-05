@@ -35,7 +35,8 @@ def register():
 
 
 @bp.route("/user")
-@login_required
 def get_user():
+    if current_user.is_anonymous:
+        return {}, 200
     user = UserModel.from_orm(current_user)
-    return user.json(), 200
+    return user.json(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200

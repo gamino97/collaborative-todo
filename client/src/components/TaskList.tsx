@@ -95,7 +95,7 @@ export default function TaskList({ tasks, onDeleteTask, onUpdateTask }: Props) {
           <ListItem
             key={task.id}
             p={4}
-            bg="gray.50"
+            bg="whiteAlpha.50"
             display="flex"
             alignItems="start"
             justifyContent="space-between"
