@@ -1,43 +1,63 @@
 import {
+  Box,
   Button,
-  Center,
-  Container,
+  Checkbox,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Input,
-  Stack,
-  Text,
-  Box,
   Link,
-  Checkbox,
-  Flex,
+  Stack,
+  useToast,
 } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import apiClient from "lib/apiClient";
+import { AxiosError, isAxiosError } from "axios";
 import AuthLayout from "components/AuthLayout";
+import { NonFieldErrors, useNonFieldErrors } from "components/NonFieldErrors";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { LoginData, LoginResponse, loginUser } from "services/login";
 
-interface FormValues {
-  email: string;
-  password: string;
-}
 export default function Login() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>();
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const res = await apiClient.post("/auth/register", { ...data });
-    console.log(res.data);
+    formState: { errors, isSubmitting, isValidating },
+  } = useForm<LoginData>();
+
+  const { nonFieldErrors, setNonFieldErrors } = useNonFieldErrors();
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<LoginData> = async (data) => {
+    setNonFieldErrors([]);
+    try {
+      const res = await loginUser(data);
+      toast({
+        title: res.message,
+        status: "success",
+        duration: 2000,
+        position: "top",
+      });
+      navigate("/demo/tasks");
+    } catch (e) {
+      console.error(e);
+      if (isAxiosError(e)) {
+        const responseError: AxiosError<LoginResponse> = e;
+        const nonFieldErrors =
+          responseError?.response?.data?.non_field_errors || [];
+        setNonFieldErrors(nonFieldErrors);
+      }
+    }
   };
+
   return (
     <AuthLayout>
       <Box textAlign="center">
         <Heading>Sign In to your Account</Heading>
       </Box>
-      <Box my={8} textAlign="left" as="section">
+      <Box my={4} textAlign="left" as="section">
+        <NonFieldErrors errors={nonFieldErrors} />
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl isInvalid={Boolean(errors.email)}>
             <FormLabel htmlFor="email">Email Address</FormLabel>
@@ -65,13 +85,21 @@ export default function Login() {
           </FormControl>
           <Stack isInline justifyContent="space-between" mt={4}>
             <Box>
-              <Checkbox>Remember Me</Checkbox>
+              <Checkbox id="remember_me" {...register("remember_me")}>
+                Remember Me
+              </Checkbox>
             </Box>
             <Box>
               <Link>Forgot your password?</Link>
             </Box>
           </Stack>
-          <Button type="submit" w="full" mt={4} colorScheme="blue">
+          <Button
+            type="submit"
+            w="full"
+            mt={4}
+            colorScheme="blue"
+            isLoading={isSubmitting || isValidating}
+          >
             Login
           </Button>
         </form>

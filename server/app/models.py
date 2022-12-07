@@ -22,6 +22,9 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean())
 
+    def __repr__(self):
+        return f"<User {self.name}>"
+
 
 class UserModel(BaseModel):
     id: int
@@ -42,6 +45,12 @@ class RegisterSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(max=300))
     email = fields.Email(required=True)
     password = fields.Str(required=True, validate=validate.Length(max=255))
+
+
+class LoginSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.Str(required=True, validate=validate.Length(max=255))
+    remember_me = fields.Boolean()
 
 
 class Task(db.Model):

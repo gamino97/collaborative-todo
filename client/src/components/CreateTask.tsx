@@ -1,25 +1,19 @@
 import {
   Box,
   Button,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
   Flex,
-  ModalFooter,
+  Modal,
   ModalBody,
   ModalCloseButton,
-  FormControl,
-  Input,
-  FormLabel,
-  Textarea,
-  FormErrorMessage,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { FormValues } from "constants/FormValues/CreateTask";
 import TaskForm from "components/TaskForm";
+import { FormValues } from "constants/FormValues/CreateTask";
+import { useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface Props {
   onCreateTask: (data: FormValues) => Promise<void>;

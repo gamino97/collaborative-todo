@@ -1,12 +1,12 @@
 from pprint import pprint
 
 from flask import Blueprint, request
-from flask_login import current_user, login_required, login_user
+from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow import ValidationError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .database import db
-from .models import RegisterSchema, User, UserModel
+from .models import LoginSchema, RegisterSchema, User, UserModel
 
 bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -25,13 +25,37 @@ def register():
         email: str = result["email"]
         password: str = result["password"]
         name: str = result["name"]
-        user = User(name=name, email=email, password=generate_password_hash(password), active=True)
+        user = User(name=name, email=email, password=generate_password_hash(password, method="sha256"), active=True)
         db.session.add(user)
         db.session.commit()
-        print(UserModel.from_orm(user))
         login_user(user)
-        response = {"messsage": "User registered", "user": user.name}
+        response = {"messsage": f"User {user.name} registered successfully", "user": user.name}
         return response, 201
+
+
+@bp.post("/login")
+def login():
+    request_data = request.get_json()
+    try:
+        result = LoginSchema().load(request_data)
+    except ValidationError as err:
+        return err.messages.copy(), 400
+    else:
+        email: str = result["email"]
+        password: str = result["password"]
+        remember_me: bool = result["remember_me"]
+        user = User.query.filter(User.email == email).first()
+        if not user or not check_password_hash(user.password, password):
+            return {"non_field_errors": ["Please check your login details and try again."]}, 400
+        login_user(user, remember=remember_me)
+        return {"message": "Logged In Successfully"}, 200
+
+
+@bp.post("/logout")
+@login_required
+def logout():
+    logout_user()
+    return {"message": "Logged Out Successfully"}, 200
 
 
 @bp.route("/user")

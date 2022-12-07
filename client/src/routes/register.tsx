@@ -1,4 +1,3 @@
-import AuthLayout from "components/AuthLayout";
 import {
   Box,
   Button,
@@ -9,20 +8,15 @@ import {
   Input,
   Link,
   Text,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import apiClient from "lib/apiClient";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { AxiosError, isAxiosError } from "axios";
-import { useUser } from "services/user";
-import { useEffect } from "react";
-
-interface FormValues {
-  email: string;
-  password: string;
-  name: string;
-}
+import AuthLayout from "components/AuthLayout";
+import apiClient from "lib/apiClient";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { RegisterData, registerUser } from "services/register";
 
 function Register() {
   const {
@@ -30,13 +24,19 @@ function Register() {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<FormValues>();
+  } = useForm<RegisterData>();
   const navigate = useNavigate();
-  const { isLoggedIn } = useUser();
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  const toast = useToast();
+  const onSubmit: SubmitHandler<RegisterData> = async (data) => {
     try {
-      await apiClient.post("/auth/register", { ...data });
-      return navigate("/demo/tasks");
+      const res = await registerUser(data);
+      toast({
+        title: res.message,
+        status: "success",
+        duration: 2000,
+        position: "top",
+      });
+      navigate("/demo/tasks");
     } catch (e) {
       console.error(e);
       if (isAxiosError(e)) {
@@ -54,11 +54,6 @@ function Register() {
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
   return (
     <AuthLayout>
       <Box textAlign="center">
