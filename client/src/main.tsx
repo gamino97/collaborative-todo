@@ -45,16 +45,17 @@ const router = createBrowserRouter(
             </React.Suspense>
           }
         />
-        <Route element={<AuthOutlet />}>
-          <Route
-            path="demo/tasks"
-            element={
-              <React.Suspense fallback={<Fallback />}>
-                <DemoTasks />
-              </React.Suspense>
-            }
-          />
-        </Route>
+        <Route
+          path="demo/tasks"
+          element={
+            <React.Suspense fallback={<Fallback />}>
+              <DemoTasks />
+            </React.Suspense>
+          }
+        />
+        {/* <Route element={<AuthOutlet />}>
+          
+        </Route> */}
       </Route>
     </>
   )

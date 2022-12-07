@@ -1,6 +1,6 @@
 import { Box, Skeleton, Stack } from "@chakra-ui/react";
 import { CreateTask } from "components/CreateTask";
-import { Task, onDeleteTask, onUpdateTask } from "lib/tasks/types";
+import { Task, onDeleteTask, onUpdateTask, onDoneTask } from "lib/tasks/types";
 import { lazy, Suspense } from "react";
 import { FormValues } from "constants/FormValues/CreateTask";
 
@@ -12,6 +12,7 @@ interface Props {
   tasks: Task[];
   onDeleteTask: onDeleteTask;
   onUpdateTask: onUpdateTask;
+  onDoneTask: onDoneTask;
 }
 
 function LoadingTaskSection() {
@@ -31,6 +32,7 @@ const TasksSection = ({
   tasks,
   onDeleteTask,
   onUpdateTask,
+  onDoneTask,
 }: Props) => {
   return (
     <Box>
@@ -44,6 +46,7 @@ const TasksSection = ({
               tasks={tasks}
               onDeleteTask={onDeleteTask}
               onUpdateTask={onUpdateTask}
+              onDoneTask={onDoneTask}
             />
           )}
         </Suspense>

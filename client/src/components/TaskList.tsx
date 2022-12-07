@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Center,
+  Checkbox,
   Flex,
   Heading,
   IconButton,
@@ -15,7 +17,7 @@ import {
   UnorderedList,
   useDisclosure,
 } from "@chakra-ui/react";
-import { onDeleteTask, onUpdateTask, Task } from "lib/tasks/types";
+import { onDeleteTask, onDoneTask, onUpdateTask, Task } from "lib/tasks/types";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { SubmitHandler, useForm } from "react-hook-form";
 import TaskForm from "components/TaskForm";
@@ -83,30 +85,49 @@ interface Props {
   tasks: Task[];
   onDeleteTask: onDeleteTask;
   onUpdateTask: onUpdateTask;
+  onDoneTask: onDoneTask;
 }
-export default function TaskList({ tasks, onDeleteTask, onUpdateTask }: Props) {
+export default function TaskList({
+  tasks,
+  onDeleteTask,
+  onUpdateTask,
+  onDoneTask,
+}: Props) {
   return (
     <UnorderedList spacing={3} styleType="none" m={0}>
       {tasks.map((task) => {
         const handleDeleteClick = () => {
           return onDeleteTask(task);
         };
+        const handleCheckboxClick = () => onDoneTask(task);
         return (
-          <ListItem
+          <Flex
+            as={ListItem}
             key={task.id}
             p={4}
             bg="whiteAlpha.50"
-            display="flex"
             alignItems="start"
             justifyContent="space-between"
+            maxW="full"
           >
-            <Box as="section">
-              <Heading size="md" as="h5">
-                {task.title}
-              </Heading>
-              {task.content && <Text>{task.content}</Text>}
-            </Box>
-            <Box as="section">
+            <Center as="section" flexShrink="1">
+              <Checkbox
+                mr={2}
+                isChecked={task.done}
+                onChange={handleCheckboxClick}
+              />
+              <Box>
+                <Heading size="md" as="h5" sx={{ hyphens: "auto" }}>
+                  {task.title}
+                </Heading>
+                {task.content && (
+                  <Text className=".my-text" sx={{ hyphens: "auto" }}>
+                    {task.content}
+                  </Text>
+                )}
+              </Box>
+            </Center>
+            <Box as="section" flex="none">
               <UpdateTask task={task} onUpdateTask={onUpdateTask} />
               <IconButton
                 colorScheme="red"
@@ -115,7 +136,7 @@ export default function TaskList({ tasks, onDeleteTask, onUpdateTask }: Props) {
                 onClick={handleDeleteClick}
               />
             </Box>
-          </ListItem>
+          </Flex>
         );
       })}
     </UnorderedList>

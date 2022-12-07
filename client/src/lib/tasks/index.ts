@@ -1,16 +1,16 @@
 import { matchSorter } from "match-sorter";
 import { sortBy } from "sort-by-typescript";
 import { FormValues } from "constants/FormValues/CreateTask";
-import { Task } from "lib/tasks/types";
+import { Task, TasksGetter, TasksSetter } from "lib/tasks/types";
 
 export async function getTasks(isDemo: boolean, query?: string) {
-  let get;
+  let get: TasksGetter;
   if (isDemo) {
-    ({ get } = await import("lib/tasks/network"));
-  } else {
     ({ get } = await import("lib/tasks/demo"));
+  } else {
+    ({ get } = await import("lib/tasks/network"));
   }
-  let tasks: Task[] = await get();
+  let tasks = await get();
   if (query) {
     tasks = matchSorter(tasks, query, { keys: ["first", "last"] });
   }
@@ -18,14 +18,14 @@ export async function getTasks(isDemo: boolean, query?: string) {
 }
 
 export async function createTask(isDemo: boolean, data: FormValues) {
-  let set;
+  let set: TasksSetter;
   const id = Math.random().toString(36).substring(2, 9);
-  const task = { ...data, id };
+  const task: Task = { ...data, id, done: false };
   const tasks = await getTasks(isDemo);
   if (isDemo) {
-    ({ set } = await import("lib/tasks/network"));
-  } else {
     ({ set } = await import("lib/tasks/demo"));
+  } else {
+    ({ set } = await import("lib/tasks/network"));
   }
   tasks.unshift(task);
   await set(tasks);
@@ -35,7 +35,7 @@ export async function createTask(isDemo: boolean, data: FormValues) {
 export async function deleteTask(isDemo: boolean, task: Task) {
   const currentTasks = await getTasks(isDemo);
   const newTasks = currentTasks.filter((t) => t.id !== task.id);
-  let set;
+  let set: TasksSetter;
   if (isDemo) {
     ({ set } = await import("lib/tasks/network"));
   } else {
@@ -50,7 +50,7 @@ export async function updateTask(isDemo: boolean, task: Task) {
   const updatedTasks = currentTasks.map((storedTask) => {
     return storedTask.id === task.id ? task : storedTask;
   });
-  let set;
+  let set: TasksSetter;
   if (isDemo) {
     ({ set } = await import("lib/tasks/network"));
   } else {
