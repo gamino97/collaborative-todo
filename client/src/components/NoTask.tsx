@@ -2,18 +2,6 @@ import NoTaskImage from "/no-task.png";
 import { Center, Heading, Kbd } from "@chakra-ui/react";
 
 const NoTask = () => {
-  // useEffect(() => {
-  //   fetch("http://localhost:5000/api/getcsrf", {
-  //     credentials: "include",
-  //   })
-  //     .then((res) => {
-  //       const csrfToken = res.headers.get("X-CSRFToken");
-  //       console.log(csrfToken);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
   return (
     <>
       <Center>

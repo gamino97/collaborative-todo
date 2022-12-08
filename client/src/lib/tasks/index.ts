@@ -14,13 +14,14 @@ export async function getTasks(isDemo: boolean, query?: string) {
   if (query) {
     tasks = matchSorter(tasks, query, { keys: ["first", "last"] });
   }
-  return tasks.sort(sortBy("-createdAt"));
+  return tasks.sort(sortBy("-created_at"));
 }
 
 export async function createTask(isDemo: boolean, data: FormValues) {
   let set: TasksSetter;
   const id = Math.random().toString(36).substring(2, 9);
-  const task: Task = { ...data, id, done: false };
+  const now = new Date();
+  const task: Task = { ...data, id, done: false, created_at: now.toJSON() };
   const tasks = await getTasks(isDemo);
   if (isDemo) {
     ({ set } = await import("lib/tasks/demo"));

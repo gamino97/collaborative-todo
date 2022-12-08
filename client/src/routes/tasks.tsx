@@ -5,12 +5,13 @@ import { FormValues } from "constants/FormValues/CreateTask";
 import { useDemoTasks } from "hooks/demoTasks";
 import { Link as ReachLink } from "react-router-dom";
 
-function DemoTasksSection() {
+function NetworkTasksSection() {
   const { tasks, createDemoTask, deleteDemoTask, updateDemoTask, onDoneTask } =
     useDemoTasks();
   const onSubmit = async (data: FormValues) => {
     await createDemoTask(data);
   };
+
   return (
     <TasksSection
       onCreateTask={onSubmit}
@@ -22,11 +23,11 @@ function DemoTasksSection() {
   );
 }
 
-function DemoTasks() {
+function NetworkTasks() {
   return (
     <BaseTabsLayout>
       <TabPanel>
-        <DemoTasksSection />
+        <NetworkTasksSection />
       </TabPanel>
       <TabPanel>
         <Center>
@@ -46,4 +47,4 @@ function DemoTasks() {
   );
 }
 
-export default DemoTasks;
+export default NetworkTasks;

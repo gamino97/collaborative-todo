@@ -3,9 +3,10 @@ import { CreateTask } from "components/CreateTask";
 import { Task, onDeleteTask, onUpdateTask, onDoneTask } from "lib/tasks/types";
 import { lazy, Suspense } from "react";
 import { FormValues } from "constants/FormValues/CreateTask";
+import TaskList from "components/TaskList";
 
-const NoTask = lazy(() => import("components/NoTask"));
-const TaskList = lazy(() => import("components/TaskList"));
+// const NoTask = lazy(() => import("components/NoTask"));
+// const TaskList = lazy(() => import("components/TaskList"));
 
 interface Props {
   onCreateTask: (data: FormValues) => Promise<void>;
@@ -38,18 +39,12 @@ const TasksSection = ({
     <Box>
       <CreateTask onCreateTask={onCreateTask} />
       <Box mt={4}>
-        <Suspense fallback={<LoadingTaskSection />}>
-          {tasks.length === 0 ? (
-            <NoTask />
-          ) : (
-            <TaskList
-              tasks={tasks}
-              onDeleteTask={onDeleteTask}
-              onUpdateTask={onUpdateTask}
-              onDoneTask={onDoneTask}
-            />
-          )}
-        </Suspense>
+        <TaskList
+          tasks={tasks}
+          onDeleteTask={onDeleteTask}
+          onUpdateTask={onUpdateTask}
+          onDoneTask={onDoneTask}
+        />
       </Box>
     </Box>
   );

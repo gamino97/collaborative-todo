@@ -22,6 +22,7 @@ import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { SubmitHandler, useForm } from "react-hook-form";
 import TaskForm from "components/TaskForm";
 import { FormValues } from "constants/FormValues/CreateTask";
+import NoTask from "components/NoTask";
 
 interface UpdateTaskProps {
   task: Task;
@@ -93,6 +94,9 @@ export default function TaskList({
   onUpdateTask,
   onDoneTask,
 }: Props) {
+  if (tasks.length === 0) {
+    return <NoTask />;
+  }
   return (
     <UnorderedList spacing={3} styleType="none" m={0}>
       {tasks.map((task) => {

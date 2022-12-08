@@ -3,6 +3,7 @@ export interface Task {
   title: string;
   content?: string;
   done: boolean;
+  created_at: string;
 }
 
 export interface onDeleteTask {
