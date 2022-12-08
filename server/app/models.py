@@ -64,6 +64,7 @@ class Task(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"))
     team = db.relationship("Team", backref="tasks")
     done = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
         return f"<Task {self.title}>"
