@@ -82,8 +82,9 @@ def create_app():
     def handle_csrf_error(e):
         return {"error": e.description}, 400
 
-    from . import auth
+    from . import auth, tasks
 
     app.register_blueprint(auth.bp)
+    app.register_blueprint(tasks.bp)
 
     return app

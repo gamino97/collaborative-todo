@@ -61,7 +61,7 @@ class Task(db.Model):
     description = db.Column(db.String(1024), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey("user_table.id"))
     author = db.relationship("User", backref="tasks")
-    team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"))
+    team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
     team = db.relationship("Team", backref="tasks")
     done = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
@@ -76,8 +76,11 @@ class TaskModel(BaseModel):
     title: str
     description: str
     done: bool
-    author_id: int
-    team_id: int
+    team_id: int | None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
 
 
 team_user = db.Table(
