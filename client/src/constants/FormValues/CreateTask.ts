@@ -1,4 +1,4 @@
-export interface FormValues {
+export interface TaskFormValues {
   title: string;
   content: string;
 }

@@ -16,6 +16,7 @@ const DemoTasks = React.lazy(() => import("routes/demo/tasks"));
 const Index = React.lazy(() => import("routes/index"));
 const Login = React.lazy(() => import("routes/login"));
 const Register = React.lazy(() => import("routes/register"));
+const NetworkTasks = React.lazy(() => import("routes/tasks"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -53,9 +54,16 @@ const router = createBrowserRouter(
             </React.Suspense>
           }
         />
-        {/* <Route element={<AuthOutlet />}>
-          
-        </Route> */}
+        <Route element={<AuthOutlet />}>
+          <Route
+            path="/tasks"
+            element={
+              <React.Suspense fallback={<Fallback />}>
+                <NetworkTasks />
+              </React.Suspense>
+            }
+          />
+        </Route>
       </Route>
     </>
   )

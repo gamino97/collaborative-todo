@@ -1,16 +1,17 @@
 import { Center, Heading, Link, TabPanel } from "@chakra-ui/react";
 import BaseTabsLayout from "components/BaseTabsLayout";
 import TasksSection from "components/TasksSection";
-import { FormValues } from "constants/FormValues/CreateTask";
-import { useDemoTasks } from "hooks/demoTasks";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
+import { useNetworkTasks } from "hooks/networkTasks";
 import { Link as ReachLink } from "react-router-dom";
 
 function NetworkTasksSection() {
   const { tasks, createDemoTask, deleteDemoTask, updateDemoTask, onDoneTask } =
-    useDemoTasks();
-  const onSubmit = async (data: FormValues) => {
+    useNetworkTasks();
+  const onSubmit = async (data: TaskFormValues) => {
     await createDemoTask(data);
   };
+  console.log({ tasks });
 
   return (
     <TasksSection

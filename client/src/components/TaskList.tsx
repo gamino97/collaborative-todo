@@ -21,7 +21,7 @@ import { onDeleteTask, onDoneTask, onUpdateTask, Task } from "lib/tasks/types";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { SubmitHandler, useForm } from "react-hook-form";
 import TaskForm from "components/TaskForm";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import NoTask from "components/NoTask";
 
 interface UpdateTaskProps {
@@ -31,14 +31,14 @@ interface UpdateTaskProps {
 
 function UpdateTask({ task, onUpdateTask }: UpdateTaskProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const methods = useForm<FormValues>({
+  const methods = useForm<TaskFormValues>({
     defaultValues: { title: task.title, content: task.content },
   });
   const {
     formState: { isSubmitting },
     reset,
   } = methods;
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  const onSubmit: SubmitHandler<TaskFormValues> = async (data) => {
     const updatedTask: Task = { ...task, ...data };
     await onUpdateTask(updatedTask);
     onClose();

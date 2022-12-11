@@ -11,17 +11,17 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import TaskForm from "components/TaskForm";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface Props {
-  onCreateTask: (data: FormValues) => Promise<void>;
+  onCreateTask: (data: TaskFormValues) => Promise<void>;
 }
 
 function CreateTask({ onCreateTask }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const methods = useForm<FormValues>();
+  const methods = useForm<TaskFormValues>();
   const {
     formState: { isSubmitting },
     reset,
@@ -35,9 +35,13 @@ function CreateTask({ onCreateTask }: Props) {
     window.addEventListener("keydown", keyPressListener);
     return () => window.removeEventListener("keydown", keyPressListener);
   }, [isOpen, onOpen]);
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    await onCreateTask(data);
-    onClose();
+  const onSubmit: SubmitHandler<TaskFormValues> = async (data) => {
+    try {
+      await onCreateTask(data);
+      onClose();
+    } catch (e) {
+      console.error(e);
+    }
   };
   return (
     <Box>

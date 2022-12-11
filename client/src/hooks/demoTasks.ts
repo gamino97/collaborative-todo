@@ -1,6 +1,6 @@
 import { useToast } from "@chakra-ui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { useSearchTask } from "hooks/filter";
 import { createTask, deleteTask, getTasks, updateTask } from "lib/tasks";
 import { onDeleteTask, onDoneTask, onUpdateTask } from "lib/tasks/types";
@@ -15,7 +15,7 @@ function useDemoTasks() {
   });
   const toast = useToast();
 
-  const createDemoTask = async (taskFormData: FormValues) => {
+  const createDemoTask = async (taskFormData: TaskFormValues) => {
     try {
       await createTask(true, taskFormData);
       queryClient.invalidateQueries(["demo", "tasks", "list"]);

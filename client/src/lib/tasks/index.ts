@@ -1,6 +1,6 @@
 import { matchSorter } from "match-sorter";
 import { sortBy } from "sort-by-typescript";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { Task, TasksGetter, TasksSetter } from "lib/tasks/types";
 
 export async function getTasks(isDemo: boolean, query?: string) {
@@ -17,7 +17,7 @@ export async function getTasks(isDemo: boolean, query?: string) {
   return tasks.sort(sortBy("-created_at"));
 }
 
-export async function createTask(isDemo: boolean, data: FormValues) {
+export async function createTask(isDemo: boolean, data: TaskFormValues) {
   let set: TasksSetter;
   const id = Math.random().toString(36).substring(2, 9);
   const now = new Date();
@@ -29,8 +29,7 @@ export async function createTask(isDemo: boolean, data: FormValues) {
     ({ set } = await import("lib/tasks/network"));
   }
   tasks.unshift(task);
-  await set(tasks);
-  return tasks;
+  return await set(tasks);
 }
 
 export async function deleteTask(isDemo: boolean, task: Task) {

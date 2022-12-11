@@ -20,7 +20,6 @@ function useUser() {
   });
   const user = query.data;
   const isLoggedIn = Boolean(user?.email);
-  console.log({ user });
 
   return { ...query, isLoggedIn };
 }

@@ -39,7 +39,7 @@ export default function Login() {
         duration: 2000,
         position: "top",
       });
-      navigate("/demo/tasks");
+      navigate("/tasks");
     } catch (e) {
       console.error(e);
       if (isAxiosError(e)) {

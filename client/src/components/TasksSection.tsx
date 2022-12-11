@@ -2,14 +2,14 @@ import { Box, Skeleton, Stack } from "@chakra-ui/react";
 import { CreateTask } from "components/CreateTask";
 import { Task, onDeleteTask, onUpdateTask, onDoneTask } from "lib/tasks/types";
 import { lazy, Suspense } from "react";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import TaskList from "components/TaskList";
 
 // const NoTask = lazy(() => import("components/NoTask"));
 // const TaskList = lazy(() => import("components/TaskList"));
 
 interface Props {
-  onCreateTask: (data: FormValues) => Promise<void>;
+  onCreateTask: (data: TaskFormValues) => Promise<void>;
   tasks: Task[];
   onDeleteTask: onDeleteTask;
   onUpdateTask: onUpdateTask;

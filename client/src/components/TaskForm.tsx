@@ -1,5 +1,5 @@
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
 import {
   FormControl,
   FormErrorMessage,
@@ -10,10 +10,10 @@ import {
 import { ReactNode } from "react";
 
 interface Props {
-  onSubmit: SubmitHandler<FormValues>;
-  methods: UseFormReturn<FormValues>;
+  onSubmit: SubmitHandler<TaskFormValues>;
+  methods: UseFormReturn<TaskFormValues>;
   children: ReactNode;
-  defaultValues?: FormValues;
+  defaultValues?: TaskFormValues;
 }
 
 function TaskForm({ onSubmit, children, methods }: Props) {

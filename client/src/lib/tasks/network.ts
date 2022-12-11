@@ -1,14 +1,17 @@
-import { Task, TasksGetter, TasksSetter } from "lib/tasks/types";
+import { TasksGetter, TasksSetter } from "lib/tasks/types";
 import apiClient from "lib/apiClient";
-import localforage from "localforage";
 
 export const set: TasksSetter = async (tasks) => {
-  return await localforage.setItem<Task[]>("tasks", tasks);
+  const newTask = tasks[0];
+  const res = await apiClient.post("/tasks/create", {
+    title: newTask.title,
+    description: newTask.content,
+  });
+  const newTasks = [...tasks];
+  newTasks[0] = res.data;
+  return newTasks;
 };
 
 export const get: TasksGetter = async () => {
-  return await apiClient.get("/tasks").then((res) => res.data);
-  let tasks = await localforage.getItem<Task[]>("tasks");
-  if (!tasks) tasks = [];
-  return tasks;
+  return await apiClient.get("/tasks/list").then((res) => res.data);
 };

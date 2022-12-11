@@ -1,61 +1,47 @@
 import { useToast } from "@chakra-ui/react";
-import { FormValues } from "constants/FormValues/CreateTask";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { TaskFormValues } from "constants/FormValues/CreateTask";
+import { useSearchTask } from "hooks/filter";
 import { createTask, deleteTask, getTasks, updateTask } from "lib/tasks";
-import { onDeleteTask, onDoneTask, onUpdateTask, Task } from "lib/tasks/types";
-import { useEffect, useState, useTransition } from "react";
+import { onDeleteTask, onDoneTask, onUpdateTask } from "lib/tasks/types";
 
-function useDemoTasks() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [, startTransition] = useTransition();
+function useNetworkTasks() {
+  const q = useSearchTask();
+  const queryClient = useQueryClient();
+  const { data: tasks } = useQuery({
+    networkMode: "always",
+    queryKey: ["network", "tasks", "list", q || "all", q],
+    queryFn: () => getTasks(false, q),
+  });
   const toast = useToast();
-  const createDemoTask = async (taskFormData: FormValues) => {
-    try {
-      const newTasks = await createTask(false, taskFormData);
-      startTransition(() => {
-        setTasks(newTasks);
-      });
-      toast({
-        title: `Task ${taskFormData.title} created successfully`,
-        status: "success",
-        duration: 2000,
-        position: "top",
-      });
-    } catch (e) {
-      toast({
-        title: `Task ${taskFormData.title} was not created`,
-        status: "error",
-        duration: 3000,
-        position: "top",
-      });
-      console.error(e);
-    }
+
+  const createDemoTask = async (taskFormData: TaskFormValues) => {
+    await createTask(false, taskFormData);
+    queryClient.invalidateQueries(["network", "tasks", "list"]);
+    toast({
+      title: `Task "${taskFormData.title}" created successfully`,
+      status: "success",
+      duration: 2000,
+      position: "top",
+    });
   };
+
   const deleteDemoTask: onDeleteTask = async (data) => {
-    const newTasks = await deleteTask(false, data);
-    startTransition(() => {
-      setTasks(newTasks);
-    });
+    await deleteTask(true, data);
+    queryClient.invalidateQueries(["network", "tasks"]);
   };
+
   const updateDemoTask: onUpdateTask = async (data) => {
-    const newTasks = await updateTask(false, data);
-    startTransition(() => {
-      setTasks(newTasks);
-    });
+    await updateTask(true, data);
+    queryClient.invalidateQueries(["network", "tasks"]);
   };
+
   const onDoneTask: onDoneTask = async (data) => {
-    const newTasks = await updateTask(false, { ...data, done: !data.done });
-    startTransition(() => {
-      setTasks(newTasks);
-    });
+    await updateTask(true, { ...data, done: !data.done });
+    queryClient.invalidateQueries(["network", "tasks"]);
   };
-  useEffect(() => {
-    getTasks(false).then((tasks) => {
-      startTransition(() => {
-        setTasks(tasks);
-      });
-    });
-  }, []);
+
   return { tasks, createDemoTask, deleteDemoTask, updateDemoTask, onDoneTask };
 }
 
-export { useDemoTasks };
+export { useNetworkTasks };
