@@ -35,3 +35,28 @@ def create_tasks():
         db.session.commit()
         task_orm = TaskModel.from_orm(task)
         return task_orm.json(), 201
+
+
+@bp.post("/update/<int:task_id>")
+@login_required
+def update_task(task_id):
+    task: Task = db.get_or_404(Task, task_id)
+    request_data = request.get_json()
+    task_schema = TaskSchema()
+    try:
+        result = task_schema.load(request_data, partial=True)
+    except ValidationError as err:
+        return err.messages.copy(), 400
+    else:
+        title = result.get("title", "")
+        description = result.get("description", "")
+        done = result.get("done", "")
+        print(task.description != description)
+        if task.title != title:
+            task.title = title
+        if task.description != description:
+            task.description = description
+        if task.done != done:
+            task.done = done
+        db.session.commit()
+        return task_schema.dump(task), 200
