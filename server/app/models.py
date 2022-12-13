@@ -63,8 +63,9 @@ class Task(db.Model):
     author = db.relationship("User", backref="tasks")
     team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
     team = db.relationship("Team", backref="tasks")
-    done = db.Column(db.Boolean, default=False)
+    done = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     def __repr__(self):
         return f"<Task {self.title}>"
