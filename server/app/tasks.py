@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from flask import Blueprint, request
+from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
 
@@ -60,3 +60,14 @@ def update_task(task_id):
             task.done = done
         db.session.commit()
         return task_schema.dump(task), 200
+
+
+@bp.post("/delete/<int:task_id>")
+@login_required
+def delete_task(task_id):
+    task: Task = db.get_or_404(Task, task_id)
+    if task.deleted:
+        abort(404)
+    task.deleted = True
+    db.session.commit()
+    return {"message": "Task deleted succesfully"}
