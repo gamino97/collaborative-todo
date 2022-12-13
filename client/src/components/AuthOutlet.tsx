@@ -8,7 +8,7 @@ export const AuthOutlet = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (!isLoading && !isLoggedIn) navigate("/login");
-  }, [isLoading, isLoggedIn]);
+  }, [isLoading, isLoggedIn, navigate]);
 
   if (isLoading) return <Fallback />;
   if (error instanceof Error) return <span>Error: {error.message}</span>;
