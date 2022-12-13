@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from .database import db
 from .models import Task, TaskModel
-from .schemas import CreateTaskSchema
+from .schemas import CreateTaskSchema, TaskSchema
 
 bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
 
@@ -14,9 +14,9 @@ bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
 @bp.get("/list")
 @login_required
 def list_tasks():
-    pprint(current_user.tasks)
-    tasks = current_user.tasks
-    return [TaskModel.from_orm(task).dict() for task in tasks]
+    tasks = Task.query.filter(Task.author == current_user, Task.deleted == False)
+    task_schema = TaskSchema(many=True)
+    return task_schema.dump(tasks)
 
 
 @bp.post("/create")
