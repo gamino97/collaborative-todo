@@ -1,11 +1,19 @@
 import { matchSorter } from "match-sorter";
 import { sortBy } from "sort-by-typescript";
 import { TaskFormValues } from "constants/FormValues/CreateTask";
-import { Task, TasksGetter, TasksSetter } from "lib/tasks/types";
+import {
+  Task,
+  TasksGetter,
+  TasksSetter,
+  Mode,
+  TaskCreate,
+  TaskUpdate,
+  TaskDelete,
+} from "lib/tasks/types";
 
-export async function getTasks(isDemo: boolean, query?: string) {
+export async function getTasks(mode: Mode, query?: string) {
   let get: TasksGetter;
-  if (isDemo) {
+  if (mode === "demo") {
     ({ get } = await import("lib/tasks/demo"));
   } else {
     ({ get } = await import("lib/tasks/network"));
@@ -17,45 +25,32 @@ export async function getTasks(isDemo: boolean, query?: string) {
   return tasks.sort(sortBy("-created_at"));
 }
 
-export async function createTask(isDemo: boolean, data: TaskFormValues) {
-  let set: TasksSetter;
-  const id = Math.random().toString(36).substring(2, 9);
-  const now = new Date();
-  const task: Task = { ...data, id, done: false, created_at: now.toJSON() };
-  const tasks = await getTasks(isDemo);
-  if (isDemo) {
-    ({ set } = await import("lib/tasks/demo"));
+export async function createTask(mode: Mode, data: TaskFormValues) {
+  let create: TaskCreate;
+  if (mode === "demo") {
+    ({ create } = await import("lib/tasks/demo"));
   } else {
-    ({ set } = await import("lib/tasks/network"));
+    ({ create } = await import("lib/tasks/network"));
   }
-  tasks.unshift(task);
-  return await set(tasks);
+  return await create(data);
 }
 
-export async function deleteTask(isDemo: boolean, task: Task) {
-  const currentTasks = await getTasks(isDemo);
-  const newTasks = currentTasks.filter((t) => t.id !== task.id);
-  let set: TasksSetter;
-  if (isDemo) {
-    ({ set } = await import("lib/tasks/network"));
+export async function deleteTask(mode: Mode, task: Task) {
+  let erase: TaskDelete;
+  if (mode === "network") {
+    ({ erase } = await import("lib/tasks/network"));
   } else {
-    ({ set } = await import("lib/tasks/demo"));
+    ({ erase } = await import("lib/tasks/demo"));
   }
-  await set(newTasks);
-  return newTasks;
+  await erase(task);
 }
 
-export async function updateTask(isDemo: boolean, task: Task) {
-  const currentTasks = await getTasks(isDemo);
-  const updatedTasks = currentTasks.map((storedTask) => {
-    return storedTask.id === task.id ? task : storedTask;
-  });
-  let set: TasksSetter;
-  if (isDemo) {
-    ({ set } = await import("lib/tasks/network"));
+export async function updateTask(mode: Mode, task: Task) {
+  let update: TaskUpdate;
+  if (mode === "network") {
+    ({ update } = await import("lib/tasks/network"));
   } else {
-    ({ set } = await import("lib/tasks/demo"));
+    ({ update } = await import("lib/tasks/demo"));
   }
-  await set(updatedTasks);
-  return updatedTasks;
+  return await update(task);
 }

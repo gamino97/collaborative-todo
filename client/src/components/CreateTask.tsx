@@ -11,21 +11,24 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import TaskForm from "components/TaskForm";
+import { Mode } from "lib/tasks/types";
 import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTasks } from "hooks/tasks";
 
 interface Props {
-  onCreateTask: (data: TaskFormValues) => Promise<void>;
+  mode: Mode;
 }
 
-function CreateTask({ onCreateTask }: Props) {
+function CreateTask({ mode }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const methods = useForm<TaskFormValues>();
   const {
     formState: { isSubmitting },
     reset,
   } = methods;
+  const { handleCreateTask } = useTasks(mode);
   useEffect(() => {
     const keyPressListener = (event: KeyboardEvent) => {
       if (event.key === "n" && event.altKey && !isOpen) {
@@ -37,14 +40,14 @@ function CreateTask({ onCreateTask }: Props) {
   }, [isOpen, onOpen]);
   const onSubmit: SubmitHandler<TaskFormValues> = async (data) => {
     try {
-      await onCreateTask(data);
+      await handleCreateTask(data);
       onClose();
     } catch (e) {
       console.error(e);
     }
   };
   return (
-    <Box>
+    <Box as="section">
       <Button colorScheme="green" onClick={onOpen}>
         Create Task
       </Button>

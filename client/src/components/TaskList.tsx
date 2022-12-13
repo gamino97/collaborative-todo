@@ -1,3 +1,4 @@
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -17,22 +18,26 @@ import {
   UnorderedList,
   useDisclosure,
 } from "@chakra-ui/react";
-import { onDeleteTask, onDoneTask, onUpdateTask, Task } from "lib/tasks/types";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { SubmitHandler, useForm } from "react-hook-form";
+import Fallback from "components/Fallback";
+import NoTask from "components/NoTask";
+import QueryError from "components/QueryError";
 import TaskForm from "components/TaskForm";
 import { TaskFormValues } from "constants/FormValues/CreateTask";
-import NoTask from "components/NoTask";
+import { useTasks } from "hooks/tasks";
+import { Mode, Task } from "lib/tasks/types";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface UpdateTaskProps {
   task: Task;
-  onUpdateTask: onUpdateTask;
+  mode: Mode;
 }
 
-function UpdateTask({ task, onUpdateTask }: UpdateTaskProps) {
+function UpdateTask({ task, mode }: UpdateTaskProps) {
+  const { handleUpdateTask } = useTasks(mode);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { title, description } = task;
   const methods = useForm<TaskFormValues>({
-    defaultValues: { title: task.title, content: task.content },
+    defaultValues: { title, description },
   });
   const {
     formState: { isSubmitting },
@@ -40,8 +45,9 @@ function UpdateTask({ task, onUpdateTask }: UpdateTaskProps) {
   } = methods;
   const onSubmit: SubmitHandler<TaskFormValues> = async (data) => {
     const updatedTask: Task = { ...task, ...data };
-    await onUpdateTask(updatedTask);
+    await handleUpdateTask(updatedTask);
     onClose();
+    reset({ title: updatedTask.title, description: updatedTask.description });
   };
   return (
     <>
@@ -83,17 +89,13 @@ function UpdateTask({ task, onUpdateTask }: UpdateTaskProps) {
 }
 
 interface Props {
-  tasks: Task[];
-  onDeleteTask: onDeleteTask;
-  onUpdateTask: onUpdateTask;
-  onDoneTask: onDoneTask;
+  mode: Mode;
 }
-export default function TaskList({
-  tasks,
-  onDeleteTask,
-  onUpdateTask,
-  onDoneTask,
-}: Props) {
+export default function TaskList({ mode }: Props) {
+  const { tasksQuery, handleDeleteTask, handleDoneTask } = useTasks(mode);
+  const { isLoading, error, data: tasks } = tasksQuery;
+  if (isLoading || !tasks) return <Fallback />;
+  if (error instanceof Error) return <QueryError error={error} />;
   if (tasks.length === 0) {
     return <NoTask />;
   }
@@ -101,9 +103,9 @@ export default function TaskList({
     <UnorderedList spacing={3} styleType="none" m={0}>
       {tasks.map((task) => {
         const handleDeleteClick = () => {
-          return onDeleteTask(task);
+          return handleDeleteTask(task);
         };
-        const handleCheckboxClick = () => onDoneTask(task);
+        const handleCheckboxClick = () => handleDoneTask(task);
         return (
           <Flex
             as={ListItem}
@@ -124,15 +126,13 @@ export default function TaskList({
                 <Heading size="md" as="h5" sx={{ hyphens: "auto" }}>
                   {task.title}
                 </Heading>
-                {task.content && (
-                  <Text className=".my-text" sx={{ hyphens: "auto" }}>
-                    {task.content}
-                  </Text>
+                {task.description && (
+                  <Text sx={{ hyphens: "auto" }}>{task.description}</Text>
                 )}
               </Box>
             </Center>
             <Box as="section" flex="none">
-              <UpdateTask task={task} onUpdateTask={onUpdateTask} />
+              <UpdateTask task={task} mode={mode} />
               <IconButton
                 colorScheme="red"
                 aria-label={`Delete ${task.title}`}

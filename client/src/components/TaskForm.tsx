@@ -37,11 +37,15 @@ function TaskForm({ onSubmit, children, methods }: Props) {
           {errors.title && errors.title.message}
         </FormErrorMessage>
       </FormControl>
-      <FormControl mt={4} isInvalid={Boolean(errors.content)}>
-        <FormLabel htmlFor="content">Content</FormLabel>
-        <Textarea id="content" placeholder="Content" {...register("content")} />
+      <FormControl mt={4} isInvalid={Boolean(errors.description)}>
+        <FormLabel htmlFor="content">Description</FormLabel>
+        <Textarea
+          id="content"
+          placeholder="Content"
+          {...register("description")}
+        />
         <FormErrorMessage>
-          {errors.content && errors.content.message}
+          {errors.description && errors.description.message}
         </FormErrorMessage>
       </FormControl>
       {children}

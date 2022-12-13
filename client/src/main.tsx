@@ -1,6 +1,10 @@
+import { ChakraProvider } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthOutlet } from "components/AuthOutlet";
+import Fallback from "components/Fallback";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { ChakraProvider } from "@chakra-ui/react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -8,9 +12,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Root from "routes/root";
-import Fallback from "components/Fallback";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthOutlet } from "components/AuthOutlet";
 
 const DemoTasks = React.lazy(() => import("routes/demo/tasks"));
 const Index = React.lazy(() => import("routes/index"));
@@ -76,6 +77,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <ChakraProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ChakraProvider>
   </React.StrictMode>
