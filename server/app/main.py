@@ -1,18 +1,17 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_login import LoginManager
-from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
 
 from .config import DATABASE_URI, config
 from .database import db
+from .ma import ma
 from .models import Task, User
 
 csrf = CSRFProtect()
 # https://testdriven.io/blog/flask-spa-auth/#frontend-served-separately-cross-domain
 migrate = Migrate()
-ma = Marshmallow()
 login_manager = LoginManager()
 
 
@@ -24,6 +23,7 @@ def create_app():
         SECRET_KEY=config.SECRET_KEY,
         SQLALCHEMY_DATABASE_URI=DATABASE_URI,
         WTF_CSRF_TIME_LIMIT=None,
+        SQLALCHEMY_ECHO=True,
     )
     # Have cookie sent
     app.secret_key = config.SECRET_KEY
@@ -43,10 +43,7 @@ def create_app():
         return User.query.get(int(user_id))
 
     if config.DEBUG:
-        app.config.update(
-            SESSION_COOKIE_DOMAIN="dev.localhost:5173",
-            SESSION_COOKIE_SAMESITE="Lax",
-        )
+        app.config.update(SESSION_COOKIE_DOMAIN="dev.localhost:5173", SESSION_COOKIE_SAMESITE="Lax")
         cors = CORS(
             app,
             resources={r"*": {"origins": "http://dev.localhost:5173"}},
@@ -59,7 +56,6 @@ def create_app():
     def hello_world(path):
         tasks = Task.query.all()
         print(tasks)
-        print(generate_csrf())
         return app.send_static_file("index.html")
 
     @app.get("/api/getcsrf")
@@ -68,15 +64,6 @@ def create_app():
         response = jsonify({"detail": "CSRF cookie set"})
         response.headers.set("X-CSRFToken", token)
         return response
-
-    @app.get("/api/user")
-    def get_user():
-        return jsonify({"username": "pedro"})
-
-    @app.post("/api/user")
-    def post_user():
-        request_data = request.get_json()
-        return {"username": "pedro"}
 
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
