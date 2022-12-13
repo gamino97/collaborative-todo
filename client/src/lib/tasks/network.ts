@@ -32,7 +32,7 @@ export const create: TaskCreate = async (data) => {
 
 export const update: TaskUpdate = async (task) => {
   const { title, description, done } = task;
-  const res = await apiClient.post(`/tasks/update/${task.uuid}`, {
+  const res = await apiClient.post(`/tasks/update/${task.id}`, {
     title,
     description,
     done,
@@ -41,7 +41,7 @@ export const update: TaskUpdate = async (task) => {
 };
 
 export const erase: TaskDelete = async (task) => {
-  const { uuid } = task;
-  const res = await apiClient.post(`/tasks/delete/${uuid}`);
+  const { id } = task;
+  const res = await apiClient.post(`/tasks/delete/${id}`);
   console.log({ resDelete: res.data });
 };
