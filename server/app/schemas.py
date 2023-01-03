@@ -1,7 +1,7 @@
 from marshmallow import EXCLUDE, fields, validate
 
 from .ma import ma
-from .models import Task
+from .models import Task, Team
 
 
 class CreateTaskSchema(ma.Schema):
@@ -23,3 +23,14 @@ class TaskSchema(ma.SQLAlchemySchema):
     done = ma.auto_field()
     created_at = ma.auto_field(dump_only=True)
     team_id = ma.auto_field()
+
+
+class TeamSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Team
+        unknown = EXCLUDE
+
+    id = ma.auto_field(dump_only=True)
+    uuid = ma.auto_field(dump_only=True)
+    name = ma.auto_field()
+    created_at = ma.auto_field(dump_only=True)
