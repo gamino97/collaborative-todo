@@ -12,6 +12,7 @@ function useTasks(mode: Mode) {
     queryKey: [mode, "tasks", "list", q || "all", q],
     queryFn: () => getTasks(mode, q),
     networkMode: mode === "demo" ? "always" : "online",
+    staleTime: Infinity,
   });
   const toast = useToast();
 

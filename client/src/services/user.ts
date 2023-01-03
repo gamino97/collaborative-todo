@@ -9,18 +9,20 @@ interface User {
   name: string;
   email: string;
 }
+
 async function fetchUser(): Promise<User> {
   const response = await apiClient.get("/auth/user");
   return response.data;
 }
+
 function useUser() {
   const query = useQuery({
     queryKey: ["user"],
     queryFn: fetchUser,
+    staleTime: Infinity,
   });
   const user = query.data;
   const isLoggedIn = Boolean(user?.email);
-
   return { ...query, isLoggedIn };
 }
 
