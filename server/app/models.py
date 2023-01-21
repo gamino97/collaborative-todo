@@ -20,6 +20,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True)
     username = db.Column(db.String(255), unique=True, nullable=True)
     password = db.Column(db.String(255), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
+    team = db.relationship("Team", backref="users")
     active = db.Column(db.Boolean())
 
     def __repr__(self):
@@ -83,21 +85,12 @@ class TaskModel(BaseModel):
     class Config:
         orm_mode = True
 
-
-team_user = db.Table(
-    "team_user",
-    db.Column("team_id", db.ForeignKey("team_table.id")),
-    db.Column("user_id", db.ForeignKey("user_table.id")),
-)
-
-
 class Team(db.Model):
     __tablename__ = "team_table"
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), default=uuid4)
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    users = db.relationship("User", secondary=team_user, backref="teams")
 
 
 class TeamModel(BaseModel):
@@ -105,5 +98,7 @@ class TeamModel(BaseModel):
     uuid: UUID4
     name: str
     created_at: datetime
-    users: list[UserModel]
     tasks: list[TaskModel]
+
+    class Config:
+        orm_mode = True
