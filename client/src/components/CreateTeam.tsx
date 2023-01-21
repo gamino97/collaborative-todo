@@ -12,8 +12,10 @@ import {
   Input,
   FormErrorMessage,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { createTeam } from "services/team";
 
 interface CreateTeamForm {
   name: string;
@@ -27,8 +29,25 @@ export function CreateTeam() {
     handleSubmit,
     register,
   } = methods;
+  const toast = useToast();
   const onSubmit: SubmitHandler<CreateTeamForm> = async (data) => {
-    console.log({ data });
+    try {
+      const newTeam = await createTeam({ data });
+      toast({
+        title: `${newTeam.name} created succesfully`,
+        status: "success",
+        duration: 2000,
+        position: "top",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: `Error creating "${data.name}"`,
+        status: "error",
+        duration: 2000,
+        position: "top",
+      });
+    }
   };
   return (
     <>
