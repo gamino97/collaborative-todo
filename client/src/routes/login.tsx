@@ -17,6 +17,7 @@ import { NonFieldErrors, useNonFieldErrors } from "components/NonFieldErrors";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { LoginData, LoginResponse, loginUser } from "services/login";
+import { useUser } from "services/user";
 
 export default function Login() {
   const {
@@ -28,6 +29,7 @@ export default function Login() {
   const { nonFieldErrors, setNonFieldErrors } = useNonFieldErrors();
   const toast = useToast();
   const navigate = useNavigate();
+  const { invalidateUserQuery } = useUser();
 
   const onSubmit: SubmitHandler<LoginData> = async (data) => {
     setNonFieldErrors([]);
@@ -39,6 +41,7 @@ export default function Login() {
         duration: 2000,
         position: "top",
       });
+      invalidateUserQuery();
       navigate("/tasks");
     } catch (e) {
       console.error(e);
