@@ -23,7 +23,7 @@ def create_app():
         SECRET_KEY=config.SECRET_KEY,
         SQLALCHEMY_DATABASE_URI=DATABASE_URI,
         WTF_CSRF_TIME_LIMIT=None,
-        SQLALCHEMY_ECHO=True,
+        # SQLALCHEMY_ECHO=True,
     )
     # Have cookie sent
     app.secret_key = config.SECRET_KEY
@@ -69,9 +69,10 @@ def create_app():
     def handle_csrf_error(e):
         return {"error": e.description}, 400
 
-    from . import auth, tasks
+    from . import auth, tasks, teams
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(tasks.bp)
+    app.register_blueprint(teams.bp)
 
     return app
