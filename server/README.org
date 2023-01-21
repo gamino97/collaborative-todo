@@ -15,3 +15,6 @@ flask --app app.main db migrate -m "My migration message"
 #+begin_src bash
 flask --app app.main db upgrade
 #+end_src
+
+* Known Bugs
++ [ ] Register crashes when input an email already registered
