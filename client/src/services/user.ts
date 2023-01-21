@@ -1,5 +1,5 @@
 import apiClient from "lib/apiClient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface User {
   active: boolean;
@@ -16,6 +16,10 @@ async function fetchUser(): Promise<User> {
 }
 
 function useUser() {
+  const queryClient = useQueryClient();
+  const invalidateUserQuery = () =>{
+    queryClient.invalidateQueries({queryKey: ['user']})
+  }
   const query = useQuery({
     queryKey: ["user"],
     queryFn: fetchUser,
@@ -23,7 +27,7 @@ function useUser() {
   });
   const user = query.data;
   const isLoggedIn = Boolean(user?.email);
-  return { ...query, isLoggedIn };
+  return { ...query, isLoggedIn, invalidateUserQuery };
 }
 
 export { useUser };

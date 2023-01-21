@@ -13,10 +13,10 @@ import {
 } from "@chakra-ui/react";
 import { AxiosError, isAxiosError } from "axios";
 import AuthLayout from "components/AuthLayout";
-import apiClient from "lib/apiClient";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { RegisterData, registerUser } from "services/register";
+import { useUser } from "services/user";
 
 function Register() {
   const {
@@ -27,9 +27,11 @@ function Register() {
   } = useForm<RegisterData>();
   const navigate = useNavigate();
   const toast = useToast();
+  const { invalidateUserQuery } = useUser();
   const onSubmit: SubmitHandler<RegisterData> = async (data) => {
     try {
       const res = await registerUser(data);
+      invalidateUserQuery()
       toast({
         title: res.message,
         status: "success",
