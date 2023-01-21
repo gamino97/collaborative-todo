@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow import ValidationError
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.exc import IntegrityError
 
 from .database import db
 from .models import LoginSchema, RegisterSchema, User, UserModel
@@ -26,10 +27,14 @@ def register():
         password: str = result["password"]
         name: str = result["name"]
         user = User(name=name, email=email, password=generate_password_hash(password, method="sha256"), active=True)
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            response = {'message': f'Email is already registered'}, 400
         login_user(user)
-        response = {"messsage": f"User {user.name} registered successfully", "user": user.name}
+        response = {"message": f"User {user.name} registered successfully", "user": user.name}
         return response, 201
 
 
