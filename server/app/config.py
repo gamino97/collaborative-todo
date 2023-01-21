@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings 
 
 
 class Settings(BaseSettings):
@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_DATABASE: str | None
     SECRET_KEY: str
-    DEBUG: bool
+    DEBUG: bool = False
 
     class Config:
         case_sensitive = True
