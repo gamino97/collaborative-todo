@@ -56,7 +56,9 @@ function CreateTask({ mode, team }: Props) {
       <Modal isOpen={isOpen} onClose={onClose} onCloseComplete={reset}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Task Creation {team && `for Team ${team}`}</ModalHeader>
+          <ModalHeader>
+            Task Creation {team && `for Team ${team.name}`}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <TaskForm onSubmit={onSubmit} methods={methods}>
