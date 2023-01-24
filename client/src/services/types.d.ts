@@ -3,6 +3,7 @@ export interface Team {
   id: number;
   uuid: string;
   created_at: string;
+  message?: string;
 }
 
 export interface CreateTeamData {
