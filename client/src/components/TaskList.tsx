@@ -26,6 +26,7 @@ import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { useTasks } from "hooks/tasks";
 import { Mode, Task } from "lib/tasks/types";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { Team } from "services/types";
 
 interface UpdateTaskProps {
   task: Task;
@@ -90,14 +91,15 @@ function UpdateTask({ task, mode }: UpdateTaskProps) {
 
 interface Props {
   mode: Mode;
+  team?: Team;
 }
-export default function TaskList({ mode }: Props) {
-  const { tasksQuery, handleDeleteTask, handleDoneTask } = useTasks(mode);
+export default function TaskList({ mode, team }: Props) {
+  const { tasksQuery, handleDeleteTask, handleDoneTask } = useTasks(mode, team);
   const { isLoading, error, data: tasks } = tasksQuery;
   if (isLoading || !tasks) return <Fallback />;
   if (error instanceof Error) return <QueryError error={error} />;
   if (tasks.length === 0) {
-    return <NoTask />;
+    return <NoTask team={team} />;
   }
   return (
     <UnorderedList spacing={3} styleType="none" m={0}>

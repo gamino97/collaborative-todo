@@ -22,10 +22,11 @@ export const get: TasksGetter = async () => {
   return await apiClient.get("/tasks/list").then((res) => res.data);
 };
 
-export const create: TaskCreate = async (data) => {
+export const create: TaskCreate = async (data, team) => {
   const res = await apiClient.post("/tasks/create", {
     title: data.title,
     description: data.description,
+    team: team,
   });
   return res.data;
 };

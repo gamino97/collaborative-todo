@@ -1,8 +1,9 @@
 import NoTaskImage from "/no-task.png";
 import { Center, Heading, Kbd } from "@chakra-ui/react";
+import { Team } from "services/types";
 
 interface Props {
-  team: boolean;
+  team?: Team;
 }
 
 const NoTask = ({ team }: Props) => {
@@ -13,7 +14,7 @@ const NoTask = ({ team }: Props) => {
       </Center>
       <Center>
         <Heading as="h2" size="xl">
-          You don&apos;t have any registered task{team && " in your team"}.
+          You don&apos;t have any registered task{team && ` in ${team.name}`}.
         </Heading>
       </Center>
       <Center>

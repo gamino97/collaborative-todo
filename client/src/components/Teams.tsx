@@ -4,7 +4,7 @@ import { JoinTeam } from "components/JoinTeam";
 import { useTeam } from "services/team";
 import Fallback from "components/Fallback";
 import QueryError from "components/QueryError";
-import NoTask from "components/NoTask";
+import TasksSection from "./TasksSection";
 
 export function NoTeam() {
   return (
@@ -30,8 +30,6 @@ export default function Teams() {
   if (isLoading || !team) return <Fallback />;
   if (error instanceof Error) return <QueryError error={error} />;
   if (team.message) return NoTeam;
-  console.log({ tasks: team.tasks });
-  const teamTasks = team.tasks;
   return (
     <>
       <Center>
@@ -39,7 +37,7 @@ export default function Teams() {
           {team.name}
         </Heading>
       </Center>
-      {teamTasks.length === 0 ? <NoTask team /> : "Hola xd"}
+      <TasksSection mode="network" team={team} />
     </>
   );
 }

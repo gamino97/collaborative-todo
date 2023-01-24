@@ -11,17 +11,19 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import TaskForm from "components/TaskForm";
-import { Mode } from "lib/tasks/types";
 import { TaskFormValues } from "constants/FormValues/CreateTask";
+import { useTasks } from "hooks/tasks";
+import { Mode } from "lib/tasks/types";
 import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useTasks } from "hooks/tasks";
+import { Team } from "services/types";
 
 interface Props {
   mode: Mode;
+  team?: Team;
 }
 
-function CreateTask({ mode }: Props) {
+function CreateTask({ mode, team }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const methods = useForm<TaskFormValues>();
   const {
@@ -40,7 +42,7 @@ function CreateTask({ mode }: Props) {
   }, [isOpen, onOpen]);
   const onSubmit: SubmitHandler<TaskFormValues> = async (data) => {
     try {
-      await handleCreateTask(data);
+      await handleCreateTask(data, Boolean(team?.name));
       onClose();
     } catch (e) {
       console.error(e);
@@ -54,7 +56,7 @@ function CreateTask({ mode }: Props) {
       <Modal isOpen={isOpen} onClose={onClose} onCloseComplete={reset}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Task Creation</ModalHeader>
+          <ModalHeader>Task Creation {team && `for Team ${team}`}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <TaskForm onSubmit={onSubmit} methods={methods}>

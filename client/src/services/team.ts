@@ -1,13 +1,6 @@
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "lib/apiClient";
-
-interface Team {
-  name: string;
-}
-
-interface CreateTeamData {
-  data: Team;
-}
+import { CreateTeamData, Team } from "services/types";
 
 async function createTeam({ data }: CreateTeamData): Promise<Team> {
   const response = await apiClient.post("/teams/create", { ...data });

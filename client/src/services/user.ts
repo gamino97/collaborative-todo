@@ -17,13 +17,16 @@ async function fetchUser(): Promise<User> {
 
 function useUser() {
   const queryClient = useQueryClient();
-  const invalidateUserQuery = () =>{
-    queryClient.invalidateQueries({queryKey: ['user']})
-  }
+  const invalidateUserQuery = () => {
+    queryClient.invalidateQueries({ queryKey: ["user"] });
+  };
   const query = useQuery({
     queryKey: ["user"],
     queryFn: fetchUser,
     staleTime: Infinity,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
   });
   const user = query.data;
   const isLoggedIn = Boolean(user?.email);

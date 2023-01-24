@@ -6,6 +6,7 @@ export interface Task {
   description: string;
   done: boolean;
   created_at: string;
+  team_id: number;
 }
 
 export interface onDeleteTask {
@@ -29,7 +30,7 @@ export interface TasksGetter {
 }
 
 export interface TaskCreate {
-  (data: TaskFormValues): Promise<Task>;
+  (data: TaskFormValues, team?: boolean): Promise<Task>;
 }
 export interface TaskUpdate {
   (data: Task): Promise<Task>;

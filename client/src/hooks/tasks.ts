@@ -3,21 +3,33 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TaskFormValues } from "constants/FormValues/CreateTask";
 import { useSearchTask } from "hooks/filter";
 import { createTask, deleteTask, getTasks, updateTask } from "lib/tasks";
-import { onDeleteTask, onDoneTask, Mode, Task } from "lib/tasks/types";
+import { Mode, onDeleteTask, onDoneTask, Task } from "lib/tasks/types";
+import { Team } from "services/types";
 
-function useTasks(mode: Mode) {
+function useTasks(mode: Mode, team?: Team) {
   const q = useSearchTask();
   const queryClient = useQueryClient();
   const tasksQuery = useQuery({
-    queryKey: [mode, "tasks", "list", q || "all", q],
-    queryFn: () => getTasks(mode, q),
+    queryKey: [
+      mode,
+      "tasks",
+      "list",
+      q || "all",
+      q,
+      team?.name || "No team",
+      team,
+    ],
+    queryFn: () => getTasks(mode, q, team),
     networkMode: mode === "demo" ? "always" : "online",
-    staleTime: Infinity,
+    staleTime: 1000 * 60,
   });
   const toast = useToast();
 
-  const handleCreateTask = async (taskFormData: TaskFormValues) => {
-    await createTask(mode, taskFormData);
+  const handleCreateTask = async (
+    taskFormData: TaskFormValues,
+    team: boolean
+  ) => {
+    await createTask(mode, taskFormData, team);
     queryClient.invalidateQueries([mode, "tasks", "list"]);
     toast({
       title: `Task "${taskFormData.title}" created successfully`,

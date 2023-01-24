@@ -10,8 +10,9 @@ import {
   TaskUpdate,
   TaskDelete,
 } from "lib/tasks/types";
+import { Team } from "services/types";
 
-export async function getTasks(mode: Mode, query?: string) {
+export async function getTasks(mode: Mode, query?: string, team?: Team) {
   let get: TasksGetter;
   if (mode === "demo") {
     ({ get } = await import("lib/tasks/demo"));
@@ -19,20 +20,32 @@ export async function getTasks(mode: Mode, query?: string) {
     ({ get } = await import("lib/tasks/network"));
   }
   let tasks = await get();
+  console.log({ team });
+  if (team && mode === "network") {
+    tasks = tasks.filter((task) => {
+      return task.team_id === team?.id;
+    });
+  } else {
+    tasks = tasks.filter((task) => !task.team_id);
+  }
   if (query) {
-    tasks = matchSorter(tasks, query, { keys: ["first", "last"] });
+    tasks = matchSorter(tasks, query, { keys: ["title", "description"] });
   }
   return tasks.sort(sortBy("-created_at"));
 }
 
-export async function createTask(mode: Mode, data: TaskFormValues) {
+export async function createTask(
+  mode: Mode,
+  data: TaskFormValues,
+  team: boolean
+) {
   let create: TaskCreate;
   if (mode === "demo") {
     ({ create } = await import("lib/tasks/demo"));
-  } else {
-    ({ create } = await import("lib/tasks/network"));
+    return await create(data);
   }
-  return await create(data);
+  ({ create } = await import("lib/tasks/network"));
+  return await create(data, team);
 }
 
 export async function deleteTask(mode: Mode, task: Task) {
