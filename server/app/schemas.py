@@ -8,6 +8,7 @@ from .models import Task, Team
 class CreateTaskSchema(ma.Schema):
     title = fields.Str(required=True, validate=[validate.Length(max=255)])
     description = fields.Str(required=False, validate=[validate.Length(max=1024)])
+    team = fields.Boolean(load_default=False)
 
     class Meta:
         unknown = EXCLUDE
@@ -35,4 +36,4 @@ class TeamSchema(ma.SQLAlchemySchema):
     uuid = ma.auto_field(dump_only=True)
     name = ma.auto_field()
     created_at = ma.auto_field(dump_only=True)
-    tasks = Nested(TaskSchema, many=True, exclude=("team_id",))
+    # tasks = Nested(TaskSchema, many=True, exclude=("team_id",))

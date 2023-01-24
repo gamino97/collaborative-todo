@@ -3,6 +3,7 @@ from pprint import pprint
 from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
+from sqlalchemy import or_
 
 from .database import db
 from .models import Task, TaskModel
@@ -14,7 +15,7 @@ bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
 @bp.get("/list")
 @login_required
 def list_tasks():
-    tasks = Task.query.filter(Task.author == current_user, Task.deleted == False)
+    tasks = Task.query.filter(or_(Task.author == current_user, Task.team_id == current_user.team_id), Task.deleted == False)
     task_schema = TaskSchema(many=True)
     return task_schema.dump(tasks)
 
@@ -30,7 +31,12 @@ def create_tasks():
     else:
         title = result.get("title")
         description = result.get("description", "")
+        team = result.get('team', False)
         task = Task(title=title, description=description, author=current_user)
+        if team:
+            if not current_user.team_id:
+                return {"message": "This user is not part of any team."}, 400
+            task.team_id = current_user.team_id
         db.session.add(task)
         db.session.commit()
         task_orm = TaskModel.from_orm(task)
