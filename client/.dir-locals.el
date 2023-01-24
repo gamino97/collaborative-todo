@@ -3,5 +3,5 @@
 
 ((tsx-mode . ((format-all-formatters . (("TSX" . (prettier))))
               (eval . (format-all-mode))))
- (typescript-mode . ((format-all-formaters . (("Typescript" . (prettier))))
+ (typescript-mode . ((format-all-formatters . (("TypeScript" . (prettier))))
                      (eval . (format-all-mode)))))
