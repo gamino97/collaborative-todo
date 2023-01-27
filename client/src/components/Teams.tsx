@@ -1,11 +1,11 @@
-import { Heading, Center, Link } from "@chakra-ui/react";
+import { Box, Center, Heading, Link } from "@chakra-ui/react";
 import { CreateTeam } from "components/CreateTeam";
-import { JoinTeam } from "components/JoinTeam";
-import { useTeam } from "services/team";
 import Fallback from "components/Fallback";
+import { JoinTeam } from "components/JoinTeam";
 import QueryError from "components/QueryError";
-import TasksSection from "./TasksSection";
 import { Link as ReachLink } from "react-router-dom";
+import { useTeam } from "services/team";
+import TasksSection from "./TasksSection";
 
 export function NoTeam() {
   return (
@@ -32,7 +32,7 @@ export default function Teams() {
   if (error instanceof Error) return <QueryError error={error} />;
   if (team.message) return <NoTeam />;
   return (
-    <>
+    <Box>
       <Center>
         <Heading as="h2" size="2xl">
           {team.name}
@@ -44,6 +44,6 @@ export default function Teams() {
           Leave this team
         </Link>
       </Center>
-    </>
+    </Box>
   );
 }
