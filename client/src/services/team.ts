@@ -25,4 +25,16 @@ function useTeam() {
   return { ...query, invalidateTeamQuery };
 }
 
-export { createTeam, useTeam };
+interface LeaveTeam {
+  teamId: number;
+}
+
+interface LeaveTeamResponse {
+  message: string;
+}
+async function leaveTeam({ teamId }: LeaveTeam): Promise<LeaveTeamResponse> {
+  const response = await apiClient.post(`/teams/${teamId}/leave`);
+  return response.data;
+}
+
+export { createTeam, leaveTeam, useTeam };
