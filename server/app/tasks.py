@@ -1,4 +1,4 @@
-from pprint import pprint
+from functools import wraps
 
 from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
@@ -15,9 +15,29 @@ bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
 @bp.get("/list")
 @login_required
 def list_tasks():
-    tasks = Task.query.filter(or_(Task.author == current_user, Task.team_id == current_user.team_id), Task.deleted == False)
+    tasks = Task.query.filter(
+        or_(Task.author == current_user, Task.team_id == current_user.team_id), Task.deleted == False
+    )
     task_schema = TaskSchema(many=True)
     return task_schema.dump(tasks)
+
+
+def task_editable_required(f):
+    "This decorator should be after login_required decorator"
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        task_id = kwargs.get("task_id", None)
+        if not task_id:
+            raise Exception("Your endpoint should have <task_id> as a param")
+        task: Task = db.get_or_404(Task, task_id)
+        if task.deleted:
+            return {"non_field_errors": "Task does not exist"}, 404
+        if not task.author == current_user or not task.team_id == current_user.team_id:
+            return {"non_field_errors": "This task is not editable"}, 400
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @bp.post("/create")
@@ -31,7 +51,7 @@ def create_tasks():
     else:
         title = result.get("title")
         description = result.get("description", "")
-        team = result.get('team', False)
+        team = result.get("team", False)
         task = Task(title=title, description=description, author=current_user)
         if team:
             if not current_user.team_id:
@@ -45,6 +65,7 @@ def create_tasks():
 
 @bp.post("/update/<int:task_id>")
 @login_required
+@task_editable_required
 def update_task(task_id):
     task: Task = db.get_or_404(Task, task_id)
     request_data = request.get_json()
@@ -57,7 +78,6 @@ def update_task(task_id):
         title = result.get("title", "")
         description = result.get("description", "")
         done = result.get("done", "")
-        print(task.description != description)
         if task.title != title:
             task.title = title
         if task.description != description:
@@ -70,10 +90,9 @@ def update_task(task_id):
 
 @bp.post("/delete/<int:task_id>")
 @login_required
+@task_editable_required
 def delete_task(task_id):
     task: Task = db.get_or_404(Task, task_id)
-    if task.deleted:
-        abort(404)
     task.deleted = True
     db.session.commit()
     return {"message": "Task deleted succesfully"}

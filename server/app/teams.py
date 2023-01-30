@@ -14,7 +14,7 @@ bp = Blueprint("teams", __name__, url_prefix="/api/teams")
 def create_team():
     user: User = current_user
     if user.team_id:
-        return {"message": "Invalid user"}, 400
+        return {"message": "Currently you are associated with a team, abandon it to join this team."}, 400
     request_data = request.get_json()
     team_schema = TeamSchema()
     try:
@@ -38,3 +38,28 @@ def my_team():
         return {"message": "No team is associated with this user"}
     team_schema = TeamSchema()
     return team_schema.dump(current_user.team)
+
+
+@bp.post("/<int:team_id>/leave")
+@login_required
+def leave_team(team_id):
+    team: Team = db.get_or_404(Team, team_id)
+    if current_user.team_id == team.id:
+        team.users.remove(current_user)
+        db.session.commit()
+    return {"message": "You successfully leave the team"}, 200
+
+
+bp.post("/<int:team_id>/join")
+
+
+@login_required
+def join_team(team_id):
+    if current_user.team_id:
+        return {"message": "Currently you are associated with a team, abandon it to join this team."}, 400
+    team: Team | None = db.get(Team, team_id)
+    if team is None:
+        return {"message": "Team does not exist"}, 404
+    team.users.append(current_user)
+    db.session.commit()
+    return {"message": f'You successfully joined to "{team.name}"'}, 200
