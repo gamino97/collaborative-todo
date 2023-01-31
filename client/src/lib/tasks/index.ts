@@ -20,7 +20,6 @@ export async function getTasks(mode: Mode, query?: string, team?: Team) {
     ({ get } = await import("lib/tasks/network"));
   }
   let tasks = await get();
-  console.log({ team });
   if (team && mode === "network") {
     tasks = tasks.filter((task) => {
       return task.team_id === team?.id;
@@ -31,7 +30,7 @@ export async function getTasks(mode: Mode, query?: string, team?: Team) {
   if (query) {
     tasks = matchSorter(tasks, query, { keys: ["title", "description"] });
   }
-  return tasks.sort(sortBy("-created_at"));
+  return tasks.sort(sortBy("done", "-created_at"));
 }
 
 export async function createTask(
