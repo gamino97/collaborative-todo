@@ -12,8 +12,10 @@ import {
   Input,
   FormErrorMessage,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { joinTeam, useTeam } from "services/team";
 
 interface JoinTeamForm {
   code: string;
@@ -21,6 +23,7 @@ interface JoinTeamForm {
 // Mostrar lista de tasks de team en la pestaña de my team
 export function JoinTeam() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { invalidateTeamQuery } = useTeam();
   const methods = useForm<JoinTeamForm>();
   const {
     reset,
@@ -28,8 +31,26 @@ export function JoinTeam() {
     handleSubmit,
     register,
   } = methods;
+  const toast = useToast();
   const onSubmit: SubmitHandler<JoinTeamForm> = async (data) => {
-    console.log({ data });
+    try {
+      const response = await joinTeam({ code: data.code });
+      invalidateTeamQuery();
+      toast({
+        title: response.message,
+        status: "success",
+        duration: 2000,
+        position: "top",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "An error ocurred while processing your request.",
+        status: "error",
+        duration: 2000,
+        position: "top",
+      });
+    }
   };
   return (
     <>
