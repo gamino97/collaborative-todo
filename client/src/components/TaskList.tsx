@@ -125,11 +125,23 @@ export default function TaskList({ mode, team }: Props) {
                 onChange={handleCheckboxClick}
               />
               <Box>
-                <Heading size="md" as="h5" sx={{ hyphens: "auto" }}>
+                <Heading
+                  size="md"
+                  as="h5"
+                  sx={{ hyphens: "auto" }}
+                  textDecoration={task.done ? "line-through" : ""}
+                  textColor={task.done ? "gray.500" : ""}
+                >
                   {task.title}
                 </Heading>
                 {task.description && (
-                  <Text sx={{ hyphens: "auto" }}>{task.description}</Text>
+                  <Text
+                    sx={{ hyphens: "auto" }}
+                    textColor={task.done ? "gray.500" : ""}
+                    decoration={task.done ? "line-through" : ""}
+                  >
+                    {task.description}
+                  </Text>
                 )}
               </Box>
             </Center>

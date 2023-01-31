@@ -96,6 +96,7 @@ function MyAvatar() {
             display="flex"
             justifyContent="center"
             alignItems="center"
+            textColor="white"
           >
             <Avatar
               name={data.name}
