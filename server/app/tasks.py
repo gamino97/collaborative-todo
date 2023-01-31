@@ -33,9 +33,9 @@ def task_editable_required(f):
         task: Task = db.get_or_404(Task, task_id)
         if task.deleted:
             return {"non_field_errors": "Task does not exist"}, 404
-        if not task.author == current_user or not task.team_id == current_user.team_id:
-            return {"non_field_errors": "This task is not editable"}, 400
-        return f(*args, **kwargs)
+        if task.author == current_user or task.team_id == current_user.team_id:
+            return f(*args, **kwargs)
+        return {"non_field_errors": "This task is not editable"}, 400
 
     return decorated_function
 
