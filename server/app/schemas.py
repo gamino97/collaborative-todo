@@ -5,6 +5,7 @@ from marshmallow_sqlalchemy.fields import Nested
 from .ma import ma
 from .models import Task, Team
 
+
 class CreateTaskSchema(ma.Schema):
     title = fields.Str(required=True, validate=[validate.Length(max=255)])
     description = fields.Str(required=False, validate=[validate.Length(max=1024)])
@@ -37,3 +38,10 @@ class TeamSchema(ma.SQLAlchemySchema):
     name = ma.auto_field()
     created_at = ma.auto_field(dump_only=True)
     # tasks = Nested(TaskSchema, many=True, exclude=("team_id",))
+
+
+class JoinTeamSchema(ma.Schema):
+    code = fields.UUID(required=True)
+
+    class Meta:
+        unknown = EXCLUDE
