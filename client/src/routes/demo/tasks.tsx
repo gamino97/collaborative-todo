@@ -16,7 +16,7 @@ function DemoTasks() {
       <TabPanel>
         <Center>
           <Heading as="h2" size="md">
-            If you want to manage teams, you can{" "}
+            If you want to create or join a team, you must{" "}
             <Link as={ReachLink} to="/login" color="teal.500">
               Log in
             </Link>
