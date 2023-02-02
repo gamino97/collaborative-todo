@@ -1,5 +1,16 @@
 #+title: README
 
+* Install dependencies
+** Generate requirements for development
+#+begin_src bash
+  pip-compile --extra test --extra dev -o dev-requirements.txt pyproject.toml
+#+end_src
+
+** Install dependencies from requirements.txt
+#+begin_src bash
+  pip install -r dev-requirements.txt
+#+end_src
+
 * Database
 ** Init database
 #+begin_src bash

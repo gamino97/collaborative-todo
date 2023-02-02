@@ -3,5 +3,6 @@
 
 ((nil . ((eval . (pyvenv-workon "collaborative-todo"))
          (gm-flask-commands-app-name . "app.main")))
- (python-mode . ((eval . (format-all-mode))
-                 (format-all-formatters . (("Python" . (black)))))))
+ (python-mode . ((fill-column . 120)
+                 (eval . (format-all-mode))
+                 (format-all-formatters . (("Python" black))))))
