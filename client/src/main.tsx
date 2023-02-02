@@ -22,6 +22,10 @@ const NetworkTeams = React.lazy(() => import("routes/teams"));
 const NetworkTabsOutlet = React.lazy(
   () => import("components/NetworkTabsOutlet")
 );
+const ForgotPassword = React.lazy(() => import("routes/forgot-password"));
+const ResetPasswordToken = React.lazy(
+  () => import("routes/reset-password-token")
+);
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,6 +43,22 @@ const router = createBrowserRouter(
         element={
           <React.Suspense fallback={<Fallback />}>
             <Register />
+          </React.Suspense>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <React.Suspense fallback={<Fallback />}>
+            <ForgotPassword />
+          </React.Suspense>
+        }
+      />
+      <Route
+        path="/reset-password-token/:token"
+        element={
+          <React.Suspense fallback={<Fallback />}>
+            <ResetPasswordToken />
           </React.Suspense>
         }
       />

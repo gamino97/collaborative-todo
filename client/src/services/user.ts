@@ -33,4 +33,52 @@ function useUser() {
   return { ...query, isLoggedIn, invalidateUserQuery };
 }
 
-export { useUser };
+async function requestResetPassword({
+  email,
+}: {
+  email: string;
+}): Promise<{ message: string }> {
+  const response = await apiClient.post("/auth/reset-password", { email });
+  return response.data;
+}
+
+interface ValidateResetPasswordTokenParams {
+  token: string | undefined;
+}
+async function validateResetPasswordToken({
+  token,
+}: ValidateResetPasswordTokenParams): Promise<{ valid: string | boolean }> {
+  const response = await apiClient.get(`/auth/reset-password-token/${token}`);
+  return response.data;
+}
+
+function useResetPasswordToken({ token }: { token: string | undefined }) {
+  const query = useQuery({
+    queryKey: ["validate", "password", "token", token],
+    queryFn: () => validateResetPasswordToken({ token }),
+    enabled: !!token,
+  });
+  return query;
+}
+
+interface ResetPasswordParams {
+  newPassword: string;
+  token: string;
+}
+async function resetPassword({
+  newPassword,
+  token,
+}: ResetPasswordParams): Promise<any> {
+  const response = await apiClient.post(`/auth/reset-password-token/${token}`, {
+    new_password: newPassword,
+  });
+  return response;
+}
+
+export {
+  useUser,
+  requestResetPassword,
+  validateResetPasswordToken,
+  useResetPasswordToken,
+  resetPassword,
+};

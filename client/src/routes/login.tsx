@@ -15,7 +15,7 @@ import { AxiosError, isAxiosError } from "axios";
 import AuthLayout from "components/AuthLayout";
 import { NonFieldErrors, useNonFieldErrors } from "components/NonFieldErrors";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { LoginData, LoginResponse, loginUser } from "services/login";
 import { useUser } from "services/user";
 
@@ -93,7 +93,9 @@ export default function Login() {
               </Checkbox>
             </Box>
             <Box>
-              <Link>Forgot your password?</Link>
+              <Link as={ReachLink} to="/forgot-password">
+                Forgot your password?
+              </Link>
             </Box>
           </Stack>
           <Button
