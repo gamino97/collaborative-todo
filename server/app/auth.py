@@ -58,7 +58,8 @@ def login():
         if not user or not check_password_hash(user.password, password):
             return {"non_field_errors": ["Please check your login details and try again."]}, 400
         login_user(user, remember=remember_me)
-        return {"message": "Logged In Successfully"}, 200
+        user_model = UserModel.from_orm(user)
+        return user_model.json(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
 
 
 @bp.post("/logout")
@@ -125,10 +126,10 @@ def reset_password_token_verify(token: str):
 @bp.post("/reset-password-token/<token>")
 def reset_password_token(token):
     if current_user.is_authenticated:
-        return {"message": False}
+        return {"message": False}, 400
     user = User.verify_reset_token(token)
     if user is None:
-        return {"message": "That is an invalid or expired token"}
+        return {"message": "That is an invalid or expired token"}, 400
     try:
         result = ResetPasswordTokenSchema().load(request.get_json())
     except ValidationError as err:
