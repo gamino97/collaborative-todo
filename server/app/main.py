@@ -8,6 +8,7 @@ from .config import DATABASE_URI, config
 from .database import db
 from .ma import ma
 from .models import Task, User
+from .mail import mail
 
 csrf = CSRFProtect()
 # https://testdriven.io/blog/flask-spa-auth/#frontend-served-separately-cross-domain
@@ -23,6 +24,12 @@ def create_app():
         SECRET_KEY=config.SECRET_KEY,
         SQLALCHEMY_DATABASE_URI=DATABASE_URI,
         WTF_CSRF_TIME_LIMIT=None,
+        MAIL_SERVER=config.MAIL_SERVER,
+        MAIL_PORT=config.MAIL_PORT,
+        MAIL_USE_SSL=config.MAIL_USE_SSL,
+        MAIL_USERNAME=config.MAIL_USERNAME,
+        MAIL_PASSWORD=config.MAIL_PASSWORD,
+        MAIL_DEFAULT_SENDER=config.MAIL_DEFAULT_SENDER
         # SQLALCHEMY_ECHO=True,
     )
     # Have cookie sent
@@ -36,6 +43,7 @@ def create_app():
 
     # Setup the login manager
     login_manager.init_app(app)
+    mail.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -43,7 +51,9 @@ def create_app():
         return User.query.get(int(user_id))
 
     if config.DEBUG:
-        app.config.update(SESSION_COOKIE_DOMAIN="dev.localhost:5173", SESSION_COOKIE_SAMESITE="Lax")
+        app.config.update(
+            SESSION_COOKIE_DOMAIN="dev.localhost:5173", SESSION_COOKIE_SAMESITE="Lax", SERVER_NAME="dev.localhost:5000"
+        )
         cors = CORS(
             app,
             resources={r"*": {"origins": "http://dev.localhost:5173"}},

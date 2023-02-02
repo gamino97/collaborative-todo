@@ -18,7 +18,9 @@ dependencies = [
     "Flask-WTF",
     "flask-login",
     "flask-marshmallow",
-    "marshmallow-sqlalchemy"
+    "marshmallow-sqlalchemy",
+    "pyjwt",
+    "Flask-Mail"
 ]
 
 [project.optional-dependencies]

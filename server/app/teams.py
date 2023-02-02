@@ -1,10 +1,11 @@
 from uuid import UUID
+
 from flask import Blueprint, request
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
 
 from .database import db
-from .models import Team, User, TeamModel
+from .models import Team, TeamModel, User
 from .schemas import JoinTeamSchema, TeamSchema
 
 bp = Blueprint("teams", __name__, url_prefix="/api/teams")

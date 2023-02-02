@@ -1,11 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from uuid import uuid4
+import jwt
 
 from flask_login import UserMixin
+from flask import current_app
 from marshmallow import Schema, fields, validate
 from pydantic import UUID4, BaseModel
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
 
 from .database import db
 
@@ -23,6 +26,22 @@ class User(UserMixin, db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
     team = db.relationship("Team", backref="users")
     active = db.Column(db.Boolean())
+
+    def get_reset_token(self, expires_sec=1800):
+        return jwt.encode(
+            {"reset_password": self.email, "exp": datetime.now(tz=timezone.utc) + timedelta(seconds=expires_sec)},
+            key=current_app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+
+    @staticmethod
+    def verify_reset_token(token: str):
+        try:
+            email = jwt.decode(token, key=current_app.config["SECRET_KEY"], algorithms=["HS256"])["reset_password"]
+        except jwt.ExpiredSignatureError as e:
+            print(e)
+            return None
+        return User.query.filter_by(email=email).first()
 
     def __repr__(self):
         return f"<User {self.name}>"
@@ -84,6 +103,7 @@ class TaskModel(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class Team(db.Model):
     __tablename__ = "team_table"

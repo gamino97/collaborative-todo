@@ -1,4 +1,4 @@
-from pydantic import BaseSettings 
+from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     DB_DATABASE: str | None
     SECRET_KEY: str
     DEBUG: bool = False
+    MAIL_SERVER: str = "smtp.gmail.com"
+    MAIL_PORT: int = 465
+    MAIL_USE_SSL: bool = True
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_DEFAULT_SENDER: str
 
     class Config:
         case_sensitive = True

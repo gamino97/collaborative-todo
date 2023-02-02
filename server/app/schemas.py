@@ -45,3 +45,17 @@ class JoinTeamSchema(ma.Schema):
 
     class Meta:
         unknown = EXCLUDE
+
+
+class ResetPasswordSchema(ma.Schema):
+    email = fields.Email(required=True)
+
+    class Meta:
+        unknown = EXCLUDE
+
+
+class ResetPasswordTokenSchema(ma.Schema):
+    new_password = fields.Str(required=True, validate=validate.Length(max=255))
+
+    class Meta:
+        unknown = EXCLUDE
