@@ -1,17 +1,9 @@
-import {
-  Box,
-  Container,
-  Tab,
-  TabList,
-  TabPanels,
-  Tabs,
-} from "@chakra-ui/react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Box, Container, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 export default function NetworkTabsOutlet() {
   const location = useLocation();
   const isMyTasksActive = location.pathname === "/tasks";
-  console.log({ isMyTasksActive });
   return (
     <Box>
       <Container maxW="container.lg" marginTop="20px">
@@ -29,9 +21,7 @@ export default function NetworkTabsOutlet() {
               My Team
             </Tab>
           </TabList>
-          {/* <TabPanels> */}
           <Outlet />
-          {/* </TabPanels> */}
         </Tabs>
       </Container>
     </Box>

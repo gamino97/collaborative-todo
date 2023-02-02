@@ -16,8 +16,7 @@ import AuthLayout from "components/AuthLayout";
 import { NonFieldErrors, useNonFieldErrors } from "components/NonFieldErrors";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { LoginData, LoginResponse, loginUser } from "services/login";
-import { useUser } from "services/user";
+import { LoginData, LoginResponse, loginUser, useUser } from "services/user";
 
 export default function Login() {
   const {
@@ -29,19 +28,19 @@ export default function Login() {
   const { nonFieldErrors, setNonFieldErrors } = useNonFieldErrors();
   const toast = useToast();
   const navigate = useNavigate();
-  const { invalidateUserQuery } = useUser();
+  const { setUser } = useUser();
 
   const onSubmit: SubmitHandler<LoginData> = async (data) => {
     setNonFieldErrors([]);
     try {
       const res = await loginUser(data);
       toast({
-        title: res.message,
+        title: "Logged in Successfully",
         status: "success",
         duration: 2000,
         position: "top",
       });
-      invalidateUserQuery();
+      setUser(res);
       navigate("/tasks");
     } catch (e) {
       console.error(e);

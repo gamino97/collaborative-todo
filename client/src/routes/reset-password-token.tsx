@@ -1,9 +1,10 @@
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Heading,
   Input,
@@ -15,12 +16,8 @@ import Fallback from "components/Fallback";
 import QueryError from "components/QueryError";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Navigate, useParams } from "react-router-dom";
-import {
-  requestResetPassword,
-  resetPassword,
-  useResetPasswordToken,
-} from "services/user";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { resetPassword, useResetPasswordToken } from "services/user";
 
 interface ForgotPasswordFields {
   newPassword: string;
@@ -31,9 +28,10 @@ function ResetPasswordToken() {
     register,
     formState: { errors, isSubmitting, isValidating },
     handleSubmit,
+    setError,
   } = useForm<ForgotPasswordFields>();
-  const [message, setMessage] = useState("");
   const { token } = useParams();
+  const [message, setMessage] = useState("");
   const {
     data: isValidToken,
     isLoading,
@@ -56,6 +54,7 @@ function ResetPasswordToken() {
       });
     }
   }, [isValidToken, toast]);
+  const navigate = useNavigate();
   if (isLoading || !isValidToken) return <Fallback />;
   if (error instanceof Error) return <QueryError error={error} />;
   if (!isValidToken.valid) return <Navigate to="/login" replace={true} />;
@@ -67,13 +66,35 @@ function ResetPasswordToken() {
         token: token || "",
         newPassword: data.newPassword,
       });
-      setMessage(response.message);
+      toast({
+        title: response.message,
+        status: "success",
+        duration: 2000,
+        position: "top",
+      });
+      navigate("/login");
     } catch (e) {
       interface Error {
-        newPassword: string[];
+        new_password?: string[];
+        message?: false | string;
       }
       const error = e as AxiosError<Error>;
-      console.log(error.response?.data);
+      const data = error.response?.data;
+      console.error(error);
+      if (data) {
+        if (data.new_password) {
+          setError("newPassword", {
+            type: "manual",
+            message: data.new_password[0],
+          });
+        }
+        if (typeof data.message === "string") {
+          setMessage(data.message);
+        }
+        if (typeof data.message === "boolean") {
+          navigate("/");
+        }
+      }
     }
   };
 
@@ -81,13 +102,20 @@ function ResetPasswordToken() {
     <AuthLayout>
       <Heading>Reset password</Heading>
       <Box textAlign={"left"}>
+        {message && (
+          <Alert status="info">
+            <AlertIcon />
+            {message}
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl mt={4}>
+          <FormControl mt={4} isInvalid={errors.newPassword}>
             <FormLabel htmlFor="newPassword">New Password</FormLabel>
             <Input
               id="newPassword"
               placeholder="Password"
-              type="newPassword"
+              type="password"
               {...register("newPassword", {
                 required: "Password is required",
               })}
