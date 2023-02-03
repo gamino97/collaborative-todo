@@ -137,7 +137,7 @@ export default function Navbar() {
       bgColor="purple.500"
       height="50px"
     >
-      <Center>
+      <Center as={Link} to="/">
         <img src={TodoIcon} alt="Todo Icon" width="30" height="30" />
         <Text as="h1" marginLeft="5px" textColor="white">
           Collaborative Todo List
