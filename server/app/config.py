@@ -2,11 +2,11 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    DB_HOST: str
-    DB_PORT: str
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_DATABASE: str | None
+    POSTGRES_HOST: str
+    POSTGRES_PORT: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str | None
     SECRET_KEY: str
     DEBUG: bool = False
     MAIL_SERVER: str = "smtp.gmail.com"
@@ -26,7 +26,7 @@ config = Settings()
 
 
 def build_database_uri() -> str:
-    return f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_DATABASE}"
+    return f"postgresql://{config.POSTGRES_USER}:{config.POSTGRES_PASSWORD}@{config.POSTGRES_HOST}:{config.POSTGRES_PORT}/{config.POSTGRES_DB}"
 
 
 DATABASE_URI = build_database_uri()
