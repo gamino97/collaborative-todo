@@ -11,13 +11,13 @@ function useDemoTasks() {
   const { data: tasks } = useQuery({
     networkMode: "always",
     queryKey: ["demo", "tasks", "list", q || "all", q],
-    queryFn: () => getTasks(true, q),
+    queryFn: () => getTasks("demo", q),
   });
   const toast = useToast();
 
   const createDemoTask = async (taskFormData: TaskFormValues) => {
     try {
-      await createTask(true, taskFormData);
+      await createTask("demo", taskFormData, false);
       queryClient.invalidateQueries(["demo", "tasks", "list"]);
       toast({
         title: `Task "${taskFormData.title}" created successfully`,
@@ -37,17 +37,17 @@ function useDemoTasks() {
   };
 
   const deleteDemoTask: onDeleteTask = async (data) => {
-    await deleteTask(true, data);
+    await deleteTask("demo", data);
     queryClient.invalidateQueries(["demo", "tasks"]);
   };
 
   const updateDemoTask: onUpdateTask = async (data) => {
-    await updateTask(true, data);
+    await updateTask("demo", data);
     queryClient.invalidateQueries(["demo", "tasks"]);
   };
 
   const onDoneTask: onDoneTask = async (data) => {
-    await updateTask(true, { ...data, done: !data.done });
+    await updateTask("demo", { ...data, done: !data.done });
     queryClient.invalidateQueries(["demo", "tasks"]);
   };
 

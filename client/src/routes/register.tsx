@@ -31,7 +31,7 @@ function Register() {
   const onSubmit: SubmitHandler<RegisterData> = async (data) => {
     try {
       const res = await registerUser(data);
-      invalidateUserQuery()
+      invalidateUserQuery();
       toast({
         title: res.message,
         status: "success",
@@ -43,12 +43,15 @@ function Register() {
       console.error(e);
       if (isAxiosError(e)) {
         const err = e as AxiosError;
+        // @ts-expect-error Fix later
         Object.entries(err.response.data).forEach(([field, message]) => {
           if (Array.isArray(message)) {
             message.forEach((m) => {
+              // @ts-expect-error This should be the same type as RegisterData
               setError(field, { type: "custom", message: m });
             });
           } else if (typeof message === "string") {
+            // @ts-expect-error This should be the same type as RegisterData
             setError(field, { type: "custom", message: message });
           }
         });

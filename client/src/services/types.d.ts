@@ -7,5 +7,5 @@ export interface Team {
 }
 
 export interface CreateTeamData {
-  data: Team;
+  data: { name: string };
 }

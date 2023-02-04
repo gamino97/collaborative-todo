@@ -110,7 +110,7 @@ function ResetPasswordToken() {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl mt={4} isInvalid={errors.newPassword}>
+          <FormControl mt={4} isInvalid={Boolean(errors.newPassword)}>
             <FormLabel htmlFor="newPassword">New Password</FormLabel>
             <Input
               id="newPassword"

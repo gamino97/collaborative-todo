@@ -21,7 +21,13 @@ export const get: TasksGetter = async () => {
 export const create: TaskCreate = async (data) => {
   const id = Math.random().toString(36).substring(2, 9);
   const now = new Date();
-  const task: Task = { ...data, id, done: false, created_at: now.toJSON() };
+  const task: Task = {
+    ...data,
+    id,
+    done: false,
+    created_at: now.toJSON(),
+    team_id: null,
+  };
   const tasks = await get();
   tasks.unshift(task);
   await set(tasks);

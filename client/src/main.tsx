@@ -27,6 +27,14 @@ const ResetPasswordToken = React.lazy(
   () => import("routes/reset-password-token")
 );
 
+function MyAuthOutlet() {
+  return (
+    <React.Suspense fallback={<Fallback />}>
+      <AuthOutlet />
+    </React.Suspense>
+  );
+}
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -79,7 +87,7 @@ const router = createBrowserRouter(
             </React.Suspense>
           }
         />
-        <Route element={<AuthOutlet />}>
+        <Route element={<MyAuthOutlet />}>
           <Route
             path="/"
             element={
