@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
@@ -51,6 +50,8 @@ def create_app():
         return User.query.get(int(user_id))
 
     if config.DEBUG:
+        from flask_cors import CORS
+
         app.config.update(
             SESSION_COOKIE_DOMAIN="dev.localhost:5173", SESSION_COOKIE_SAMESITE="Lax", SERVER_NAME="dev.localhost:5000"
         )
@@ -61,12 +62,11 @@ def create_app():
             supports_credentials=True,
         )
 
-    @app.route("/", defaults={"path": ""})
-    @app.route("/<path:path>")
-    def hello_world(path):
-        tasks = Task.query.all()
-        print(tasks)
-        return app.send_static_file("index.html")
+        @app.route("/", defaults={"path": ""})
+        @app.route("/<path:path>")
+        def hello_world(path):
+            print("Punto de entrada de mi aplicación")
+            return app.send_static_file("index.html")
 
     @app.get("/api/getcsrf")
     def get_csrf():

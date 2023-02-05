@@ -20,7 +20,8 @@ dependencies = [
     "flask-marshmallow",
     "marshmallow-sqlalchemy",
     "pyjwt",
-    "Flask-Mail"
+    "Flask-Mail",
+    "gunicorn"
 ]
 
 [project.optional-dependencies]
