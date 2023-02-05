@@ -140,7 +140,7 @@ export default function Navbar() {
       <Center as={Link} to="/">
         <img src={TodoIcon} alt="Todo Icon" width="30" height="30" />
         <Text as="h1" marginLeft="5px" textColor="white">
-          Collaborative Todo List
+          Collaborative To-Do List
         </Text>
       </Center>
       <Center>

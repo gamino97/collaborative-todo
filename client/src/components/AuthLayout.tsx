@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: Props) {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/");
+      navigate("/tasks");
     }
   }, [isLoggedIn, navigate]);
 

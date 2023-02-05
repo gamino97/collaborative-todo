@@ -1,4 +1,5 @@
 import apiClient from "lib/apiClient";
+import { User } from "services/user";
 
 export interface RegisterData {
   email: string;
@@ -8,7 +9,7 @@ export interface RegisterData {
 
 export interface RegisterSuccessResponse {
   message: string;
-  user: string;
+  user: User;
 }
 
 export async function registerUser(

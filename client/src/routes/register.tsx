@@ -9,7 +9,6 @@ import {
   Link,
   Text,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
 import { AxiosError, isAxiosError } from "axios";
 import AuthLayout from "components/AuthLayout";
@@ -27,18 +26,18 @@ function Register() {
   } = useForm<RegisterData>();
   const navigate = useNavigate();
   const toast = useToast();
-  const { invalidateUserQuery } = useUser();
+  const { setUser } = useUser();
   const onSubmit: SubmitHandler<RegisterData> = async (data) => {
     try {
       const res = await registerUser(data);
-      invalidateUserQuery();
+      setUser(res.user);
       toast({
         title: res.message,
         status: "success",
         duration: 2000,
         position: "top",
       });
-      navigate("/demo/tasks");
+      navigate("/tasks");
     } catch (e) {
       console.error(e);
       if (isAxiosError(e)) {
@@ -64,9 +63,9 @@ function Register() {
       <Box textAlign="center">
         <Heading>Register a new Account</Heading>
       </Box>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack spacing={4} my={8} textAlign="left" as="section" width="full">
-          <FormControl isInvalid={Boolean(errors.name)}>
+      <Box my={4} textAlign="left" as="section">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl isInvalid={Boolean(errors.name)} mt={4}>
             <FormLabel htmlFor="name">Name</FormLabel>
             <Input
               id="name"
@@ -77,7 +76,7 @@ function Register() {
               {errors.name && errors.name.message}
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={Boolean(errors.email)}>
+          <FormControl isInvalid={Boolean(errors.email)} mt={4}>
             <FormLabel htmlFor="email">Email Address</FormLabel>
             <Input
               id="email"
@@ -89,7 +88,7 @@ function Register() {
               {errors.email && errors.email.message}
             </FormErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl mt={4}>
             <FormLabel htmlFor="password">Password</FormLabel>
             <Input
               id="password"
@@ -101,17 +100,17 @@ function Register() {
               {errors.password && errors.password.message}
             </FormErrorMessage>
           </FormControl>
-          <Button type="submit" w="full" colorScheme="blue">
+          <Button mt={4} type="submit" w="full" colorScheme="blue">
             Register
           </Button>
-          <Text>
-            Already a member?{" "}
-            <Link as={ReachLink} color="teal.500" to="/login">
-              Log in
-            </Link>
-          </Text>
-        </VStack>
-      </form>
+        </form>
+      </Box>
+      <Text>
+        Already a member?{" "}
+        <Link as={ReachLink} color="teal.500" to="/login">
+          Log in
+        </Link>
+      </Text>
     </AuthLayout>
   );
 }

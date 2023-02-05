@@ -18,16 +18,17 @@ import { CreateTeam } from "components/CreateTeam";
 import Fallback from "components/Fallback";
 import { JoinTeam } from "components/JoinTeam";
 import QueryError from "components/QueryError";
+import { useState } from "react";
 import { leaveTeam, useTeam } from "services/team";
 import { Team } from "services/types";
 import TasksSection from "./TasksSection";
-import { useState } from "react";
+import EmptyTeam from "/box.png";
 
 export function NoTeam() {
   return (
     <>
       <Center>
-        <img src="/box.png" alt="No team" loading="lazy" />
+        <img src={EmptyTeam} alt="No team" loading="lazy" />
       </Center>
       <Center>
         <Heading as="h2" size="xl">

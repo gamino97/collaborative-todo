@@ -1,14 +1,16 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
-  Center,
   Box,
-  Text,
   Button,
-  Heading,
+  Center,
   Flex,
+  Heading,
   Link,
+  Text,
 } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
+import TodoHome from "/todo-home.png";
+
 function Footer() {
   return (
     <Center as="footer" h="2em" mt="auto">
@@ -28,7 +30,7 @@ export default function Index() {
     >
       <Flex minW="100vw" justifyContent="center" as="main" wrap="wrap">
         <Box padding="6" mt="12">
-          <Heading>Collaborative To Do</Heading>
+          <Heading>Collaborative To-Do List</Heading>
           <Text mt="10">
             On this website, you can create tasks, either individually or
             collaboratively.
@@ -43,7 +45,7 @@ export default function Index() {
           </Flex>
         </Box>
         <Box>
-          <img src="/todo-home.png" height={500} width={500} />
+          <img src={TodoHome} height={500} width={500} />
         </Box>
       </Flex>
       <Footer />

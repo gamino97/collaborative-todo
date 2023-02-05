@@ -1,7 +1,7 @@
 import apiClient from "lib/apiClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-interface User {
+export interface User {
   active: boolean;
   created_at: string;
   updated_at: null | string;

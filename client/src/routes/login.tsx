@@ -9,6 +9,7 @@ import {
   Input,
   Link,
   Stack,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 import { AxiosError, isAxiosError } from "axios";
@@ -92,7 +93,7 @@ export default function Login() {
               </Checkbox>
             </Box>
             <Box>
-              <Link as={ReachLink} to="/forgot-password">
+              <Link as={ReachLink} to="/forgot-password" color="teal.500">
                 Forgot your password?
               </Link>
             </Box>
@@ -108,6 +109,12 @@ export default function Login() {
           </Button>
         </form>
       </Box>
+      <Text>
+        Need an account?{" "}
+        <Link as={ReachLink} to="/register" color="teal.500">
+          Sign up
+        </Link>
+      </Text>
     </AuthLayout>
   );
 }
