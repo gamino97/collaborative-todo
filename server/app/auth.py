@@ -39,7 +39,11 @@ def register():
             db.session.rollback()
             response = {"message": f"Email is already registered"}, 400
         login_user(user)
-        response = {"message": f"User {user.name} registered successfully", "user": user.name}
+        user_model = UserModel.from_orm(user)
+        response = {
+            "message": f"User {user.name} registered successfully",
+            "user": user_model.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}),
+        }
         return response, 201
 
 
