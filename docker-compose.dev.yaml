@@ -5,11 +5,9 @@ services:
     image: postgres:15.1-alpine
     volumes:
       - db-data:/var/lib/postgres/data/
-    # ports:
-    #   - "5432:5432"
-    expose:
-      - 5432
-    env_file: ./server/.env.prod
+    ports:
+      - "5432:5432"
+    env_file: ./server/.env
 
   web:
     build:
@@ -17,10 +15,8 @@ services:
       dockerfile: Dockerfile
     # command: flask --app app.main run --host=0.0.0.0
     command: gunicorn --bind 0.0.0.0:5000 "app.main:create_app()"
-    # ports:
-    #   - "5000:5000"
     env_file:
-      - ./server/.env.prod
+      - ./server/.env
     depends_on:
       - db
     expose:
