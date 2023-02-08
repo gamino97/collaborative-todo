@@ -33,7 +33,6 @@ def test_reset_password_token_expired_token(client, user: User):
 
 
 def test_reset_password_token_invalid_token(client):
-    response = client.get("/reset-password-token/token")
-
+    response = client.get(url_for("auth.reset_password_token_verify", token="token"))
     assert response.status_code == 200
     assert response.json == {"valid": "That is an invalid or expired token"}
