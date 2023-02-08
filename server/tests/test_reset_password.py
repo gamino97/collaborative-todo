@@ -30,3 +30,12 @@ def test_reset_password_user_logged(app, user):
             response = client.post(url_for("auth.reset_password"), json=request_data)
             assert response.status_code == 401
             assert len(outbox) == 0
+
+
+def test_reset_password_email_does_not_exist(client, user):
+    request_data = {"email": f"otro{user.email}"}
+    with mail.record_messages() as outbox:
+        response = client.post(url_for("auth.reset_password"), json=request_data)
+        assert response.status_code == 200
+        assert len(outbox) == 0
+        assert "message" in response.json
