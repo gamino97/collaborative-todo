@@ -18,15 +18,9 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = True
-        env_file = "../.env"
+        env_file = "../.env.dev"
         env_file_encoding = "utf-8"
 
 
-config = Settings()
-
-
-def build_database_uri() -> str:
+def build_database_uri(config: Settings) -> str:
     return f"postgresql://{config.POSTGRES_USER}:{config.POSTGRES_PASSWORD}@{config.POSTGRES_HOST}:{config.POSTGRES_PORT}/{config.POSTGRES_DB}"
-
-
-DATABASE_URI = build_database_uri()

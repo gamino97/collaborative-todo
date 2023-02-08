@@ -1,14 +1,12 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
-import jwt
 
-from flask_login import UserMixin
+import jwt
 from flask import current_app
-from marshmallow import Schema, fields, validate
+from flask_login import UserMixin
 from pydantic import UUID4, BaseModel
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-
 
 from .database import db
 
@@ -60,18 +58,6 @@ class UserModel(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class RegisterSchema(Schema):
-    name = fields.Str(required=True, validate=validate.Length(max=300))
-    email = fields.Email(required=True)
-    password = fields.Str(required=True, validate=validate.Length(max=255))
-
-
-class LoginSchema(Schema):
-    email = fields.Email(required=True)
-    password = fields.Str(required=True, validate=validate.Length(max=255))
-    remember_me = fields.Boolean()
 
 
 class Task(db.Model):

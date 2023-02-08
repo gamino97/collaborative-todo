@@ -1,18 +1,22 @@
-from pprint import pprint
+import http
 
-
-from flask import Blueprint, current_app, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask import Blueprint, abort, current_app, request
+from flask_login import current_user, login_user, logout_user
+from flask_mail import Message
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_mail import Message
-from .mail import mail
 
-from app.schemas import ResetPasswordSchema, ResetPasswordTokenSchema
+from app.schemas import (
+    LoginSchema,
+    RegisterSchema,
+    ResetPasswordSchema,
+    ResetPasswordTokenSchema,
+)
 
 from .database import db
-from .models import LoginSchema, RegisterSchema, User, UserModel
+from .mail import mail
+from .models import User, UserModel
 
 bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -23,11 +27,8 @@ def register():
     try:
         result = RegisterSchema().load(request_data)
     except ValidationError as err:
-        pprint(err.messages)
-        pprint(err.valid_data)
         return err.messages.copy(), 400
     else:
-        # return result.copy(), 201
         email: str = result["email"]
         password: str = result["password"]
         name: str = result["name"]
@@ -37,7 +38,7 @@ def register():
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            response = {"message": f"Email is already registered"}, 400
+            return {"email": ["Email is already registered."]}, 400
         login_user(user)
         user_model = UserModel.from_orm(user)
         response = {
@@ -63,11 +64,10 @@ def login():
             return {"non_field_errors": ["Please check your login details and try again."]}, 400
         login_user(user, remember=remember_me)
         user_model = UserModel.from_orm(user)
-        return user_model.json(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
+        return user_model.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
 
 
 @bp.post("/logout")
-@login_required
 def logout():
     logout_user()
     return {"message": "Logged Out Successfully"}, 200
@@ -78,7 +78,7 @@ def get_user():
     if current_user.is_anonymous:
         return {}, 200
     user = UserModel.from_orm(current_user)
-    return user.json(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
+    return user.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
 
 
 # https://medium.com/@stevenrmonaghan/password-reset-with-flask-mail-protocol-ddcdfc190968
@@ -102,6 +102,8 @@ If you did not make this request then simply ignore this email and no changes wi
 
 @bp.post("/reset-password")
 def reset_password():
+    if current_user.is_authenticated:
+        abort(http.HTTPStatus.UNAUTHORIZED)
     request_data = request.get_json()
     try:
         result = ResetPasswordSchema().load(request_data)

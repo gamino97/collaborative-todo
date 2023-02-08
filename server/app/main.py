@@ -1,13 +1,15 @@
-from flask import Flask, jsonify, request
+from http import HTTPStatus
+
+from flask import Flask, abort, jsonify
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
 
-from .config import DATABASE_URI, config
+from .config import Settings, build_database_uri
 from .database import db
 from .ma import ma
-from .models import Task, User
 from .mail import mail
+from .models import User
 
 csrf = CSRFProtect()
 # https://testdriven.io/blog/flask-spa-auth/#frontend-served-separately-cross-domain
@@ -15,7 +17,11 @@ migrate = Migrate()
 login_manager = LoginManager()
 
 
-def create_app():
+def create_app(env_file=None, extra_config: dict | None = None):
+
+    config = Settings(_env_file=env_file, _env_file_encoding="utf-8")
+    DATABASE_URI = build_database_uri(config)
+
     app = Flask(__name__, static_folder="../static", static_url_path="/static")
 
     app.config.update(
@@ -33,6 +39,8 @@ def create_app():
     )
     # Have cookie sent
     app.secret_key = config.SECRET_KEY
+    if extra_config is not None:
+        app.config.update(extra_config)
     db.init_app(app)
 
     csrf.init_app(app)
@@ -40,7 +48,7 @@ def create_app():
     migrate.init_app(app, db)
     ma.init_app(app)
 
-    # Setup the login manager
+    # Set up the login manager
     login_manager.init_app(app)
     mail.init_app(app)
 
@@ -48,6 +56,10 @@ def create_app():
     def load_user(user_id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
         return User.query.get(int(user_id))
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        abort(HTTPStatus.UNAUTHORIZED)
 
     if config.DEBUG:
         from flask_cors import CORS
@@ -62,11 +74,10 @@ def create_app():
             supports_credentials=True,
         )
 
-        @app.route("/", defaults={"path": ""})
-        @app.route("/<path:path>")
-        def hello_world(path):
-            print("Punto de entrada de mi aplicación")
-            return app.send_static_file("index.html")
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def hello_world(path):
+        return app.send_static_file("index.html")
 
     @app.get("/api/getcsrf")
     def get_csrf():
