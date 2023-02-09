@@ -1,11 +1,11 @@
-from uuid import UUID
+from http import HTTPStatus
 
-from flask import Blueprint, request
+from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
 
 from .database import db
-from .models import Team, TeamModel, User
+from .models import Team, User
 from .schemas import JoinTeamSchema, TeamSchema
 
 bp = Blueprint("teams", __name__, url_prefix="/api/teams")
@@ -16,13 +16,16 @@ bp = Blueprint("teams", __name__, url_prefix="/api/teams")
 def create_team():
     user: User = current_user
     if user.team_id:
-        return {"message": "Currently you are associated with a team, abandon it to join this team."}, 400
+        return abort(
+            HTTPStatus.BAD_REQUEST,
+            description={"message": "Currently you are associated with a team, abandon it to join this team."},
+        )
     request_data = request.get_json()
     team_schema = TeamSchema()
     try:
         result = team_schema.load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        abort(HTTPStatus.BAD_REQUEST, description=err.messages.copy())
     else:
         name: str = result.get("name")
         team = Team(name=name)
