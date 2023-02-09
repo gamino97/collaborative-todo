@@ -31,7 +31,7 @@ def test_delete_task_with_unauthorized_user(app, client, user):
 
     # check response
     assert response.status_code == 401
-    assert "error" in response.json
+    assert "description" in response.json
 
 
 def test_delete_task_with_wrong_team_membership(app, user):
@@ -75,7 +75,7 @@ def test_delete_task_with_not_found_task(app, user):
 
     # check response
     assert response.status_code == 404
-    assert "error" in response.json
+    assert "description" in response.json
 
 
 def test_delete_task_with_deleted_task(app, client, user):
@@ -87,4 +87,4 @@ def test_delete_task_with_deleted_task(app, client, user):
         response = client.post(url_for("tasks.delete_task", task_id=task.id))
     # check response
     assert response.status_code == 404
-    assert "error" in response.json
+    assert "description" in response.json

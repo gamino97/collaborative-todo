@@ -85,5 +85,4 @@ def test_create_task_with_unauthenticated_user(app, user):
     # Verifica que se devuelve un error de autorización
     assert response.status_code == 401
     data = response.get_json()
-    print(data)
-    assert "error" in data
+    assert "description" in data

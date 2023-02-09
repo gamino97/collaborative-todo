@@ -51,7 +51,7 @@ def test_update_task_with_unauthorized_user(app, client, user):
 
     # check response
     assert response.status_code == 401
-    assert "error" in response.json
+    assert "description" in response.json
 
 
 def test_update_task_with_deleted_task(app, client, user):
@@ -64,7 +64,7 @@ def test_update_task_with_deleted_task(app, client, user):
         response = client.put(url_for("tasks.update_task", task_id=task.id), json=request_data)
     # check response
     assert response.status_code == 404
-    assert "error" in response.json
+    assert "description" in response.json
 
 
 def test_update_task_with_wrong_team_membership(app, user):
@@ -79,4 +79,5 @@ def test_update_task_with_wrong_team_membership(app, user):
     with app.test_client(user=user) as client:
         response = client.put(url_for("tasks.update_task", task_id=task.id), json=request_data)
     # check response
-    assert response.status_code == 401
+    assert response.status_code == 403
+    assert "description" in response.json
