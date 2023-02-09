@@ -23,7 +23,7 @@ def list_tasks():
 
 
 def task_editable_required(f):
-    "This decorator should be after login_required decorator"
+    """This decorator should be after login_required decorator"""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -42,7 +42,7 @@ def task_editable_required(f):
 
 @bp.post("/create")
 @login_required
-def create_tasks():
+def create_task():
     request_data = request.get_json()
     try:
         result = CreateTaskSchema().load(request_data)
@@ -60,7 +60,7 @@ def create_tasks():
         db.session.add(task)
         db.session.commit()
         task_orm = TaskModel.from_orm(task)
-        return task_orm.json(), 201
+        return task_orm.dict(), 201
 
 
 @bp.post("/update/<int:task_id>")
