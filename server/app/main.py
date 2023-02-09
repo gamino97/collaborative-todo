@@ -61,6 +61,10 @@ def create_app(env_file=None, extra_config: dict | None = None):
     def resourse_access_unauthorized(e):
         return jsonify(error=str(e)), HTTPStatus.UNAUTHORIZED
 
+    @app.errorhandler(HTTPStatus.NOT_FOUND)
+    def resourse_access_unauthorized(e):
+        return jsonify(error=str(e)), HTTPStatus.NOT_FOUND
+
     @login_manager.unauthorized_handler
     def unauthorized():
         abort(HTTPStatus.UNAUTHORIZED)
