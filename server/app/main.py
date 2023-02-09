@@ -4,6 +4,7 @@ from flask import Flask, abort, jsonify
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
+from werkzeug.exceptions import HTTPException
 
 from .config import Settings, build_database_uri
 from .database import db
@@ -57,13 +58,11 @@ def create_app(env_file=None, extra_config: dict | None = None):
         # since the user_id is just the primary key of our user table, use it in the query for the user
         return User.query.get(int(user_id))
 
-    @app.errorhandler(HTTPStatus.UNAUTHORIZED)
-    def resourse_access_unauthorized(e):
-        return jsonify(error=str(e)), HTTPStatus.UNAUTHORIZED
-
-    @app.errorhandler(HTTPStatus.NOT_FOUND)
-    def resourse_access_unauthorized(e):
-        return jsonify(error=str(e)), HTTPStatus.NOT_FOUND
+    @app.errorhandler(HTTPException)
+    def handle_exception(e: HTTPException):
+        """Return JSON instead of HTML for HTTP errors."""
+        # replace the body with JSON
+        return jsonify(code=e.code, name=e.name, description=e.description), e.code
 
     @login_manager.unauthorized_handler
     def unauthorized():
