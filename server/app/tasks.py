@@ -1,4 +1,5 @@
 from functools import wraps
+from http import HTTPStatus
 
 from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
@@ -32,10 +33,13 @@ def task_editable_required(f):
             raise Exception("Your endpoint should have <task_id> as a param")
         task: Task = db.get_or_404(Task, task_id)
         if task.deleted:
-            return {"non_field_errors": "Task does not exist"}, 404
-        if task.author == current_user or task.team_id == current_user.team_id:
+            abort(404, description="Task does not exist")
+        if task.team_id == current_user.team_id:
             return f(*args, **kwargs)
-        return {"non_field_errors": "This task is not editable"}, 400
+        # task.team_id != current_user.team_id
+        if task.author == current_user and task.team_id is None:
+            return f(*args, **kwargs)
+        abort(HTTPStatus.UNAUTHORIZED, description="You are not authorized to modify this task")
 
     return decorated_function
 
@@ -63,21 +67,31 @@ def create_task():
         return task_orm.dict(), 201
 
 
-@bp.post("/update/<int:task_id>")
+def verify_is_task_editable(task: Task):
+    message = task.is_task_editable_by_user(current_user)
+    if message == "authorized":
+        return
+    if message == "deleted":
+        abort(404, description="Task does not exist")
+    if message == "unauthorized":
+        abort(HTTPStatus.UNAUTHORIZED, description="You are not authorized to modify this task")
+
+
+@bp.put("/update/<int:task_id>")
 @login_required
-@task_editable_required
 def update_task(task_id):
     task: Task = db.get_or_404(Task, task_id)
+    verify_is_task_editable(task)
     request_data = request.get_json()
     task_schema = TaskSchema()
     try:
-        result = task_schema.load(request_data, partial=True)
+        result = task_schema.load(request_data)
     except ValidationError as err:
         return err.messages.copy(), 400
     else:
-        title = result.get("title", "")
-        description = result.get("description", "")
-        done = result.get("done", "")
+        title = result.get("title")
+        description = result.get("description")
+        done = result.get("done")
         if task.title != title:
             task.title = title
         if task.description != description:
