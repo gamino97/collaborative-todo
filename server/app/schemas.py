@@ -35,7 +35,7 @@ class TeamSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field(dump_only=True)
     uuid = ma.auto_field(dump_only=True)
-    name = ma.auto_field()
+    name = ma.auto_field(validate=[validate.Length(min=1, max=255)])
     created_at = ma.auto_field(dump_only=True)
     # tasks = Nested(TaskSchema, many=True, exclude=("team_id",))
 
