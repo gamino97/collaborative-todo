@@ -1,10 +1,8 @@
 import pytest
 from flask import url_for
-from marshmallow import ValidationError
 
 from app.database import db
 from app.models import Team, User
-from app.schemas import TeamSchema
 
 
 @pytest.fixture
