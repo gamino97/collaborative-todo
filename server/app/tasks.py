@@ -23,27 +23,6 @@ def list_tasks():
     return task_schema.dump(tasks)
 
 
-def task_editable_required(f):
-    """This decorator should be after login_required decorator"""
-
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        task_id = kwargs.get("task_id", None)
-        if not task_id:
-            raise Exception("Your endpoint should have <task_id> as a param")
-        task: Task = db.get_or_404(Task, task_id)
-        if task.deleted:
-            abort(404, description="Task does not exist")
-        if task.team_id is not None and task.team_id == current_user.team_id:
-            return f(*args, **kwargs)
-        # task.team_id != current_user.team_id
-        if task.author == current_user and task.team_id is None:
-            return f(*args, **kwargs)
-        abort(HTTPStatus.UNAUTHORIZED, description="You are not authorized to modify this task")
-
-    return decorated_function
-
-
 @bp.post("/create")
 @login_required
 def create_task():
