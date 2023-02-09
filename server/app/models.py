@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Literal
 from uuid import uuid4
 
 import jwt
@@ -73,6 +74,16 @@ class Task(db.Model):
     done = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
+    def is_task_editable_by_user(self, user: User) -> Literal["deleted", "unauthorized", "authorized"]:
+        if self.deleted:
+            return "deleted"
+        if self.team_id == user.team_id:
+            return "authorized"
+        # task.team_id != current_user.team_id
+        if self.author_id == user.id and self.team_id is None:
+            return "authorized"
+        return "unauthorized"
 
     def __repr__(self):
         return f"<Task {self.title}>"
