@@ -57,6 +57,10 @@ def create_app(env_file=None, extra_config: dict | None = None):
         # since the user_id is just the primary key of our user table, use it in the query for the user
         return User.query.get(int(user_id))
 
+    @app.errorhandler(HTTPStatus.UNAUTHORIZED)
+    def resourse_access_unauthorized(e):
+        return jsonify(error=str(e)), HTTPStatus.UNAUTHORIZED
+
     @login_manager.unauthorized_handler
     def unauthorized():
         abort(HTTPStatus.UNAUTHORIZED)
