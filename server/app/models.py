@@ -65,7 +65,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), default=uuid4)
     title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(1024), nullable=False)
+    description = db.Column(db.String(1024), nullable=False, default="")
     author_id = db.Column(db.Integer, db.ForeignKey("user_table.id"))
     author = db.relationship("User", backref="tasks")
     team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
@@ -86,6 +86,7 @@ class TaskModel(BaseModel):
     done: bool
     team_id: int | None
     created_at: datetime
+    author_id: int
 
     class Config:
         orm_mode = True
