@@ -21,7 +21,7 @@ class TaskSchema(ma.SQLAlchemySchema):
         unknown = EXCLUDE
 
     id = ma.auto_field(dump_only=True)
-    title = ma.auto_field()
+    title = ma.auto_field(validate=[validate.Length(min=1, max=255)])
     description = ma.auto_field()
     done = ma.auto_field()
     created_at = ma.auto_field(dump_only=True)
