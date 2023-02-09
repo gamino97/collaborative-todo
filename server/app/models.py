@@ -78,7 +78,7 @@ class Task(db.Model):
     def is_task_editable_by_user(self, user: User) -> Literal["deleted", "unauthorized", "authorized"]:
         if self.deleted:
             return "deleted"
-        if self.team_id == user.team_id:
+        if self.team_id is not None and self.team_id == user.team_id:
             return "authorized"
         # task.team_id != current_user.team_id
         if self.author_id == user.id and self.team_id is None:

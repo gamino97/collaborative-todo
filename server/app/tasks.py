@@ -34,7 +34,7 @@ def task_editable_required(f):
         task: Task = db.get_or_404(Task, task_id)
         if task.deleted:
             abort(404, description="Task does not exist")
-        if task.team_id == current_user.team_id:
+        if task.team_id is not None and task.team_id == current_user.team_id:
             return f(*args, **kwargs)
         # task.team_id != current_user.team_id
         if task.author == current_user and task.team_id is None:
@@ -74,7 +74,7 @@ def verify_is_task_editable(task: Task):
     if message == "deleted":
         abort(404, description="Task does not exist")
     if message == "unauthorized":
-        abort(HTTPStatus.UNAUTHORIZED, description="You are not authorized to modify this task")
+        abort(HTTPStatus.FORBIDDEN, description="You are not authorized to modify this task")
 
 
 @bp.put("/update/<int:task_id>")
@@ -104,9 +104,9 @@ def update_task(task_id):
 
 @bp.post("/delete/<int:task_id>")
 @login_required
-@task_editable_required
 def delete_task(task_id):
     task: Task = db.get_or_404(Task, task_id)
+    verify_is_task_editable(task)
     task.deleted = True
     db.session.commit()
     return {"message": "Task deleted succesfully"}
