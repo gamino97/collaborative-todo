@@ -1,7 +1,7 @@
 from flask import url_for
 
 from app.database import db
-from app.models import Task, Team, User
+from app.models import Task, Team
 
 
 def test_list_tasks_with_authenticated_user(app, user):
