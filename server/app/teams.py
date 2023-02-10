@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, abort, request
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
 
@@ -13,12 +14,12 @@ bp = Blueprint("teams", __name__, url_prefix="/api/teams")
 
 @bp.post("/create")
 @login_required
-def create_team():
+def create_team() -> ResponseReturnValue:
     user: User = current_user
     if user.team_id:
         return abort(
             HTTPStatus.BAD_REQUEST,
-            description={"message": "Currently you are associated with a team, abandon it to join this team."},
+            description="Currently you are associated with a team, abandon it to join this team.",
         )
     request_data = request.get_json()
     team_schema = TeamSchema()
@@ -37,7 +38,7 @@ def create_team():
 
 @bp.get("/myteam")
 @login_required
-def my_team():
+def my_team() -> ResponseReturnValue:
     user = current_user
     if not user.team_id:
         return {"message": "No team is associated with this user"}
@@ -47,7 +48,7 @@ def my_team():
 
 @bp.post("/<int:team_id>/leave")
 @login_required
-def leave_team(team_id):
+def leave_team(team_id) -> ResponseReturnValue:
     team: Team = db.get_or_404(Team, team_id)
     if current_user.team_id == team.id:
         team.users.remove(current_user)
@@ -57,7 +58,7 @@ def leave_team(team_id):
 
 @bp.post("/join")
 @login_required
-def join_team():
+def join_team() -> ResponseReturnValue:
     if current_user.team_id:
         return {"message": "Currently you are associated with a team, abandon it to join this team."}, 400
     # team: Team | None = db.get(Team, team_id)
@@ -66,11 +67,11 @@ def join_team():
     try:
         result = join_team_schema.load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        return abort(HTTPStatus.BAD_REQUEST, description=err.messages.copy())
     team_code = str(result.get("code"))
     team: Team | None = Team.query.filter(Team.uuid == team_code).one_or_none()
     if team is None:
-        return {"message": "Team does not exist"}, 404
+        return abort(404, description="Team does not exist")
     team.users.append(current_user)
     db.session.commit()
     return {"message": f'You successfully joined to "{team.name}"'}, 200

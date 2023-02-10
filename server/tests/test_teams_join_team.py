@@ -42,7 +42,7 @@ def test_join_team_with_invalid_input(app, user):
     with app.test_client(user=user) as client:
         response = client.post(url_for("teams.join_team"), json={})
     assert response.status_code == 400
-    assert response.get_json() == {"code": ["Missing data for required field."]}
+    assert response.json["description"] == {"code": ["Missing data for required field."]}
 
 
 def test_join_team_with_nonexistent_team(app, user):
@@ -51,7 +51,7 @@ def test_join_team_with_nonexistent_team(app, user):
     with app.test_client(user=user) as client:
         response = client.post(url_for("teams.join_team"), json={"code": uuid4()})
     assert response.status_code == 404
-    assert response.json["description"] == {"message": "Team does not exist"}
+    assert response.json["description"] == "Team does not exist"
 
 
 def test_join_team_without_login(client):

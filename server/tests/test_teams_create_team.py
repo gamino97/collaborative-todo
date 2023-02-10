@@ -35,9 +35,7 @@ def test_create_team_with_user_already_associated_to_team(app, user, team_data):
     with app.test_client(user=user) as client:
         response = client.post(url_for("teams.create_team"), json=team_data)
     assert response.status_code == 400
-    assert response.json["description"] == {
-        "message": "Currently you are associated with a team, abandon it to join this team."
-    }
+    assert response.json["description"] == "Currently you are associated with a team, abandon it to join this team."
 
 
 def test_create_team_with_invalid_data(app, user, team_data):
