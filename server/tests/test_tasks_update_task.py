@@ -36,7 +36,7 @@ def test_update_task_with_invalid_data(app, user):
 
     # check response
     assert response.status_code == 400
-    assert data["title"] == ["Length must be between 1 and 255."]
+    assert data["description"]["title"] == ["Length must be between 1 and 255."]
 
 
 def test_update_task_with_unauthorized_user(app, client, user):

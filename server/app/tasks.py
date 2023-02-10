@@ -1,7 +1,7 @@
-from functools import wraps
 from http import HTTPStatus
 
 from flask import Blueprint, abort, request
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
 from sqlalchemy import or_
@@ -15,7 +15,7 @@ bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
 
 @bp.get("/list")
 @login_required
-def list_tasks():
+def list_tasks() -> ResponseReturnValue:
     tasks = Task.query.filter(
         or_(Task.author == current_user, Task.team_id == current_user.team_id), Task.deleted == False
     )
@@ -25,12 +25,12 @@ def list_tasks():
 
 @bp.post("/create")
 @login_required
-def create_task():
+def create_task() -> ResponseReturnValue:
     request_data = request.get_json()
     try:
         result = CreateTaskSchema().load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        abort(400, err.messages.copy())
     else:
         title = result.get("title")
         description = result.get("description", "")
@@ -38,7 +38,7 @@ def create_task():
         task = Task(title=title, description=description, author=current_user)
         if team:
             if not current_user.team_id:
-                return {"message": "This user is not part of any team."}, 400
+                abort(400, description="This user is not part of any team.")
             task.team_id = current_user.team_id
         db.session.add(task)
         db.session.commit()
@@ -58,7 +58,7 @@ def verify_is_task_editable(task: Task):
 
 @bp.put("/update/<int:task_id>")
 @login_required
-def update_task(task_id):
+def update_task(task_id) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)
     verify_is_task_editable(task)
     request_data = request.get_json()
@@ -66,7 +66,7 @@ def update_task(task_id):
     try:
         result = task_schema.load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        abort(400, err.messages.copy())
     else:
         title = result.get("title")
         description = result.get("description")
@@ -83,7 +83,7 @@ def update_task(task_id):
 
 @bp.post("/delete/<int:task_id>")
 @login_required
-def delete_task(task_id):
+def delete_task(task_id) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)
     verify_is_task_editable(task)
     task.deleted = True

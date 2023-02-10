@@ -60,7 +60,7 @@ def test_create_task_with_invalid_data(app, user):
     # Verifica que se requiere un título
     assert response.status_code == 400
     data = response.get_json()
-    assert "title" in data
+    assert "title" in data["description"]
 
 
 def test_create_task_with_team_without_team_membership(app, user):
@@ -73,7 +73,7 @@ def test_create_task_with_team_without_team_membership(app, user):
     # Verifica que se devuelve un error de equipo
     assert response.status_code == 400
     data = response.get_json()
-    assert data["message"] == "This user is not part of any team."
+    assert data["description"] == "This user is not part of any team."
 
 
 def test_create_task_with_unauthenticated_user(app, user):
