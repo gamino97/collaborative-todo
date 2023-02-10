@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
-from flask import Flask, abort, jsonify
+from flask import Flask, abort
+from flask.typing import ResponseReturnValue
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
@@ -59,10 +60,10 @@ def create_app(env_file=None, extra_config: dict | None = None):
         return User.query.get(int(user_id))
 
     @app.errorhandler(HTTPException)
-    def handle_exception(e: HTTPException):
+    def handle_exception(e: HTTPException) -> ResponseReturnValue:
         """Return JSON instead of HTML for HTTP errors."""
         # replace the body with JSON
-        return jsonify(code=e.code, name=e.name, description=e.description), e.code
+        return {"code": e.code, "name": e.name, "description": e.description}, e.code
 
     @login_manager.unauthorized_handler
     def unauthorized():
@@ -87,11 +88,9 @@ def create_app(env_file=None, extra_config: dict | None = None):
         return app.send_static_file("index.html")
 
     @app.get("/api/getcsrf")
-    def get_csrf():
+    def get_csrf() -> ResponseReturnValue:
         token = generate_csrf()
-        response = jsonify({"detail": "CSRF cookie set"})
-        response.headers.set("X-CSRFToken", token)
-        return response
+        return {"detail": "CSRF cookie set"}, 200, {"X-CSRFToken": token}
 
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
