@@ -20,7 +20,7 @@ def test_reset_password_invalid_email(client):
         response = client.post(url_for("auth.reset_password"), json=request_data)
         assert len(outbox) == 0
         assert response.status_code == 400
-        assert response.json == {"email": ["Not a valid email address."]}
+        assert response.json["description"] == {"email": ["Not a valid email address."]}
 
 
 def test_reset_password_user_logged(app, user):

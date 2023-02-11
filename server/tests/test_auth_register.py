@@ -22,10 +22,10 @@ def test_no_name_register(client):
     data = {"name": "", "email": "example@example.com", "password": "strong_password"}
     response = client.post("/api/auth/register", json=data)
     assert response.status_code == 400
-    assert response.json["name"]
-    assert type(response.json["name"]) == list
-    assert not response.json.get("password")
-    assert not response.json.get("email")
+    data = response.json["description"]
+    assert type(data["name"]) == list
+    assert not data.get("password")
+    assert not data.get("email")
     assert User.query.count() == 0
 
 
@@ -33,10 +33,10 @@ def test_no_email_register(client):
     data = {"name": "Carlos", "email": "", "password": "strong_password"}
     response = client.post("/api/auth/register", json=data)
     assert response.status_code == 400
-    assert response.json["email"]
-    assert type(response.json["email"]) == list
-    assert not response.json.get("password")
-    assert not response.json.get("name")
+    data = response.json["description"]
+    assert type(data["email"]) == list
+    assert not data.get("password")
+    assert not data.get("name")
     assert User.query.count() == 0
 
 
@@ -44,10 +44,10 @@ def test_invalid_email_register(client):
     data = {"name": "Carlos", "email": "wrong_email_format", "password": "strong_password"}
     response = client.post("/api/auth/register", json=data)
     assert response.status_code == 400
-    assert response.json["email"]
-    assert type(response.json["email"]) == list
-    assert not response.json.get("password")
-    assert not response.json.get("name")
+    data = response.json["description"]
+    assert type(data["email"]) == list
+    assert not data.get("password")
+    assert not data.get("name")
     assert User.query.count() == 0
 
 
@@ -55,10 +55,10 @@ def test_no_password_register(client):
     data = {"name": "Carlos", "email": "example@example.com", "password": ""}
     response = client.post("/api/auth/register", json=data)
     assert response.status_code == 400
-    assert response.json["password"]
-    assert type(response.json["password"]) == list
-    assert not response.json.get("email")
-    assert not response.json.get("name")
+    data = response.json["description"]
+    assert type(data["password"]) == list
+    assert not data.get("email")
+    assert not data.get("name")
     assert User.query.count() == 0
 
 
@@ -73,6 +73,7 @@ def test_already_registered_email(client):
     response = client.post("/api/auth/register", json=data)
     assert response.status_code == 400
     assert User.query.count() == 1
-    assert response.json["email"]
-    assert type(response.json["email"]) == list
-    assert response.json["email"][0] == "Email is already registered."
+    data = response.json["description"]
+    assert data["email"]
+    assert type(data["email"]) == list
+    assert data["email"][0] == "Email is already registered."

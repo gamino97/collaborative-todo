@@ -44,7 +44,7 @@ def test_login_failure_bad_credentials(app: Flask):
             "/api/auth/login", json={"email": "test@example.com", "password": "bad_password", "remember_me": True}
         )
         assert response.status_code == 400
-        assert "non_field_errors" in response.get_json()
+        assert response.json["description"] == "Please check your login details and try again."
         with client.session_transaction() as session:
             assert "_user_id" not in session
 
@@ -54,7 +54,8 @@ def test_login_failure_missing_data(app: Flask):
     with app.test_client() as client:
         response = client.post("api/auth/login", json={})
         assert response.status_code == 400
-        assert "email" in response.get_json()
-        assert "password" in response.get_json()
+        data = response.json["description"]
+        assert "email" in data
+        assert "password" in data
         with client.session_transaction() as session:
             assert "_user_id" not in session

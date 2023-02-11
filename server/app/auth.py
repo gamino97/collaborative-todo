@@ -1,6 +1,7 @@
 import http
 
 from flask import Blueprint, abort, current_app, request
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_user, logout_user
 from flask_mail import Message
 from marshmallow import ValidationError
@@ -17,18 +18,18 @@ from app.schemas import (
 
 from .database import db
 from .mail import mail
-from .models import User, UserModel
+from .models import User
 
 bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
 @bp.post("/register")
-def register():
+def register() -> ResponseReturnValue:
     request_data = request.get_json()
     try:
         result = RegisterSchema().load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        abort(400, description=err.messages.copy())
     else:
         email: str = result["email"]
         password: str = result["password"]
@@ -39,43 +40,43 @@ def register():
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {"email": ["Email is already registered."]}, 400
+            abort(400, description={"email": ["Email is already registered."]})
         login_user(user)
-        user_model = UserModel.from_orm(user)
+        user_schema = UserSchema()
         response = {
             "message": f"User {user.name} registered successfully",
-            "user": user_model.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}),
+            "user": user_schema.dump(user),
         }
         return response, 201
 
 
 @bp.post("/login")
-def login():
+def login() -> ResponseReturnValue:
     request_data = request.get_json()
     try:
         result = LoginSchema().load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        abort(400, description=err.messages.copy())
     else:
         email: str = result["email"]
         password: str = result["password"]
         remember_me: bool = result["remember_me"]
         user = User.query.filter(User.email == email).first()
         if not user or not check_password_hash(user.password, password):
-            return {"non_field_errors": ["Please check your login details and try again."]}, 400
+            abort(400, description="Please check your login details and try again.")
         login_user(user, remember=remember_me)
-        user_model = UserModel.from_orm(user)
-        return user_model.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
+        user_schema = UserSchema()
+        return user_schema.dump(user), 200
 
 
 @bp.post("/logout")
-def logout():
+def logout() -> ResponseReturnValue:
     logout_user()
     return {"message": "Logged Out Successfully"}, 200
 
 
 @bp.route("/user")
-def get_user():
+def get_user() -> ResponseReturnValue:
     if current_user.is_anonymous:
         return {}, 200
     user_schema = UserSchema()
@@ -102,14 +103,14 @@ If you did not make this request then simply ignore this email and no changes wi
 
 
 @bp.post("/reset-password")
-def reset_password():
+def reset_password() -> ResponseReturnValue:
     if current_user.is_authenticated:
         abort(http.HTTPStatus.UNAUTHORIZED)
     request_data = request.get_json()
     try:
         result = ResetPasswordSchema().load(request_data)
     except ValidationError as err:
-        return err.messages.copy(), 400
+        return abort(400, description=err.messages.copy())
     email: str = result["email"]
     user = User.query.filter(User.email == email).first()
     if user:
@@ -121,7 +122,7 @@ If you do not receive an email, it may be because you are banned, your account i
 
 
 @bp.get("/reset-password-token/<token>")
-def reset_password_token_verify(token: str):
+def reset_password_token_verify(token: str) -> ResponseReturnValue:
     if current_user.is_authenticated:
         return {"valid": False}
     user = User.verify_reset_token(token)
@@ -131,16 +132,16 @@ def reset_password_token_verify(token: str):
 
 
 @bp.post("/reset-password-token/<token>")
-def reset_password_token(token):
+def reset_password_token(token) -> ResponseReturnValue:
     if current_user.is_authenticated:
-        return {"message": False}, 400
+        abort(400, description={"message": False})
     user = User.verify_reset_token(token)
     if user is None:
-        return {"message": "That is an invalid or expired token"}, 400
+        abort(400, description={"message": "That is an invalid or expired token"})
     try:
         result = ResetPasswordTokenSchema().load(request.get_json())
     except ValidationError as err:
-        return err.messages.copy(), 400
+        return abort(400, description=err.messages.copy())
     hashed_password = generate_password_hash(result["new_password"], method="sha256")
     user.password = hashed_password
     db.session.commit()
