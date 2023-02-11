@@ -12,6 +12,7 @@ from app.schemas import (
     RegisterSchema,
     ResetPasswordSchema,
     ResetPasswordTokenSchema,
+    UserSchema,
 )
 
 from .database import db
@@ -77,8 +78,8 @@ def logout():
 def get_user():
     if current_user.is_anonymous:
         return {}, 200
-    user = UserModel.from_orm(current_user)
-    return user.dict(include={"name", "active", "created_at", "email", "uuid", "updated_at"}), 200
+    user_schema = UserSchema()
+    return user_schema.dump(current_user), 200
 
 
 # https://medium.com/@stevenrmonaghan/password-reset-with-flask-mail-protocol-ddcdfc190968

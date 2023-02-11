@@ -1,3 +1,6 @@
+from collections import Counter
+
+
 def test_get_user_success(app, user):
     with app.test_client(user=user) as client:
         # Login the user
@@ -9,13 +12,11 @@ def test_get_user_success(app, user):
 
         # Assert the response
         assert response.status_code == 200
-        data = response.get_json()
-        assert "name" in data
-        assert "active" in data
-        assert "created_at" in data
-        assert "email" in data
-        assert "uuid" in data
-        assert "updated_at" in data
+        data: dict = response.json
+        response_keys = ["name", "active", "created_at", "email", "uuid", "updated_at"]
+        for key in response_keys:
+            assert key in data
+        assert Counter(data.keys()) == Counter(response_keys)
 
 
 def test_get_user_unauthenticated(app):
@@ -25,4 +26,4 @@ def test_get_user_unauthenticated(app):
 
         # Assert the response
         assert response.status_code == 200
-        assert response.get_json() == {}
+        assert response.json == {}
