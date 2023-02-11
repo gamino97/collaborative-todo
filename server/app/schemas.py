@@ -25,7 +25,8 @@ class TaskSchema(ma.SQLAlchemySchema):
     description = ma.auto_field()
     done = ma.auto_field()
     created_at = ma.auto_field(dump_only=True)
-    team_id = ma.auto_field()
+    team_id = ma.auto_field(dump_only=True)
+    author_id = ma.auto_field(dump_only=True)
 
 
 class TeamSchema(ma.SQLAlchemySchema):

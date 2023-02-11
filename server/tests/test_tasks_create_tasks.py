@@ -1,7 +1,7 @@
 from flask import url_for
 
 from app.database import db
-from app.models import Task, Team, User
+from app.models import Team
 
 
 def test_create_task_with_valid_data(app, user):

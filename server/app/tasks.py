@@ -7,7 +7,7 @@ from marshmallow import ValidationError
 from sqlalchemy import or_
 
 from .database import db
-from .models import Task, TaskModel
+from .models import Task
 from .schemas import CreateTaskSchema, TaskSchema
 
 bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
@@ -42,8 +42,7 @@ def create_task() -> ResponseReturnValue:
             task.team_id = current_user.team_id
         db.session.add(task)
         db.session.commit()
-        task_orm = TaskModel.from_orm(task)
-        return task_orm.dict(), 201
+        return TaskSchema().dump(task), 201
 
 
 def verify_is_task_editable(task: Task):
