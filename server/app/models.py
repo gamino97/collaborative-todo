@@ -89,34 +89,9 @@ class Task(db.Model):
         return f"<Task {self.title}>"
 
 
-class TaskModel(BaseModel):
-    id: int
-    uuid: UUID4
-    title: str
-    description: str
-    done: bool
-    team_id: int | None
-    created_at: datetime
-    author_id: int
-
-    class Config:
-        orm_mode = True
-
-
 class Team(db.Model):
     __tablename__ = "team_table"
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), default=uuid4)
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
-
-
-class TeamModel(BaseModel):
-    id: int
-    uuid: UUID4
-    name: str
-    created_at: datetime
-    tasks: list[TaskModel]
-
-    class Config:
-        orm_mode = True
