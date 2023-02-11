@@ -1,9 +1,21 @@
 # pyright: reportOptionalCall=false
 from marshmallow import EXCLUDE, Schema, fields, validate
-from marshmallow_sqlalchemy.fields import Nested
 
 from .ma import ma
-from .models import Task, Team
+from .models import Task, Team, User
+
+
+class UserSchema(ma.SQLAlchemySchema):
+    name = ma.auto_field()
+    active = ma.auto_field()
+    created_at = ma.auto_field()
+    email = ma.auto_field()
+    uuid = ma.auto_field()
+    updated_at = ma.auto_field()
+
+    class Meta:
+        model = User
+        unknown = EXCLUDE
 
 
 class CreateTaskSchema(ma.Schema):
