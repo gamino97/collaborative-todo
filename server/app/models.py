@@ -46,21 +46,6 @@ class User(UserMixin, db.Model):
         return f"<User {self.name}>"
 
 
-class UserModel(BaseModel):
-    id: int
-    uuid: UUID4
-    name: str
-    created_at: datetime
-    updated_at: datetime | None
-    email: str
-    username: str | None
-    password: str
-    active: bool
-
-    class Config:
-        orm_mode = True
-
-
 class Task(db.Model):
     __tablename__ = "task_table"
     id = db.Column(db.Integer, primary_key=True)
