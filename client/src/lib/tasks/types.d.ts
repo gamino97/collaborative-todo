@@ -7,6 +7,7 @@ export interface Task {
   done: boolean;
   created_at: string;
   team_id: number | null;
+  author_id: number;
 }
 
 export interface onDeleteTask {
