@@ -1,6 +1,7 @@
 import http
 
-from flask import Blueprint, abort, current_app, request
+from apiflask import APIBlueprint, abort
+from flask import current_app, request
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_user, logout_user
 from flask_mail import Message
@@ -20,7 +21,7 @@ from .database import db
 from .mail import mail
 from .models import User
 
-bp = Blueprint("auth", __name__, url_prefix="/api/auth")
+bp = APIBlueprint("auth", __name__, url_prefix="/api/auth")
 
 
 @bp.post("/register")
@@ -51,22 +52,34 @@ def register() -> ResponseReturnValue:
 
 
 @bp.post("/login")
-def login() -> ResponseReturnValue:
-    request_data = request.get_json()
-    try:
-        result = LoginSchema().load(request_data)
-    except ValidationError as err:
-        abort(400, description=err.messages.copy())
-    else:
-        email: str = result["email"]
-        password: str = result["password"]
-        remember_me: bool = result["remember_me"]
-        user = User.query.filter(User.email == email).first()
-        if not user or not check_password_hash(user.password, password):
-            abort(400, description="Please check your login details and try again.")
-        login_user(user, remember=remember_me)
-        user_schema = UserSchema()
-        return user_schema.dump(user), 200
+@bp.input(LoginSchema)
+@bp.doc(responses={400: "Invalid Credentials"})
+@bp.output(UserSchema)
+def login(data) -> ResponseReturnValue:
+    email: str = data["email"]
+    password: str = data["password"]
+    remember_me: bool = data["remember_me"]
+    user = User.query.filter(User.email == email).first()
+    if not user or not check_password_hash(user.password, password):
+        abort(400, message="Please check your login details and try again.")
+    login_user(user, remember=remember_me)
+    user_schema = UserSchema()
+    return user
+    # request_data = request.get_json()
+    # try:
+    #     result = LoginSchema().load(request_data)
+    # except ValidationError as err:
+    #     abort(400, detail=err.messages.copy())
+    # else:
+    #     email: str = result["email"]
+    #     password: str = result["password"]
+    #     remember_me: bool = result["remember_me"]
+    #     user = User.query.filter(User.email == email).first()
+    #     if not user or not check_password_hash(user.password, password):
+    #         abort(400, detail="Please check your login details and try again.")
+    #     login_user(user, remember=remember_me)
+    #     user_schema = UserSchema()
+    #     return user_schema.dump(user), 200
 
 
 @bp.post("/logout")
