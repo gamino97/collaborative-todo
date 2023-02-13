@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from apiflask import APIFlask
 from flask import Flask, abort
 from flask.typing import ResponseReturnValue
 from flask_login import LoginManager
@@ -20,11 +21,13 @@ login_manager = LoginManager()
 
 
 def create_app(env_file=None, extra_config: dict | None = None):
-
-    config = Settings(_env_file=env_file, _env_file_encoding="utf-8")
+    if env_file is None:
+        config = Settings()
+    else:
+        config = Settings(_env_file=env_file, _env_file_encoding="utf-8")
     DATABASE_URI = build_database_uri(config)
 
-    app = Flask(__name__, static_folder="../static", static_url_path="/static")
+    app = APIFlask(__name__, static_folder="../static", static_url_path="/static")
 
     app.config.update(
         DEBUG=config.DEBUG,
@@ -36,7 +39,8 @@ def create_app(env_file=None, extra_config: dict | None = None):
         MAIL_USE_SSL=config.MAIL_USE_SSL,
         MAIL_USERNAME=config.MAIL_USERNAME,
         MAIL_PASSWORD=config.MAIL_PASSWORD,
-        MAIL_DEFAULT_SENDER=config.MAIL_DEFAULT_SENDER
+        MAIL_DEFAULT_SENDER=config.MAIL_DEFAULT_SENDER,
+        SWAGGER_UI_CONFIG={"supportedSubmitMethods": []}
         # SQLALCHEMY_ECHO=True,
     )
     # Have cookie sent
@@ -59,11 +63,11 @@ def create_app(env_file=None, extra_config: dict | None = None):
         # since the user_id is just the primary key of our user table, use it in the query for the user
         return User.query.get(int(user_id))
 
-    @app.errorhandler(HTTPException)
-    def handle_exception(e: HTTPException) -> ResponseReturnValue:
-        """Return JSON instead of HTML for HTTP errors."""
-        # replace the body with JSON
-        return {"code": e.code, "name": e.name, "description": e.description}, e.code
+    # @app.errorhandler(HTTPException)
+    # def handle_exception(e: HTTPException) -> ResponseReturnValue:
+    #     """Return JSON instead of HTML for HTTP errors."""
+    #     # replace the body with JSON
+    #     return {"code": e.code, "name": e.name, "description": e.description}, e.code
 
     @login_manager.unauthorized_handler
     def unauthorized():

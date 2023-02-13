@@ -1,5 +1,6 @@
 # pyright: reportOptionalCall=false
-from marshmallow import EXCLUDE, Schema, fields, validate
+from apiflask import Schema, fields
+from marshmallow import EXCLUDE, validate
 
 from .ma import ma
 from .models import Task, Team, User
@@ -19,8 +20,8 @@ class UserSchema(ma.SQLAlchemySchema):
 
 
 class CreateTaskSchema(ma.Schema):
-    title = fields.Str(required=True, validate=[validate.Length(max=255)])
-    description = fields.Str(required=False, validate=[validate.Length(max=1024)])
+    title = fields.String(required=True, validate=[validate.Length(max=255)])
+    description = fields.String(required=False, validate=[validate.Length(max=1024)])
     team = fields.Boolean(load_default=False)
 
     class Meta:
@@ -68,21 +69,21 @@ class ResetPasswordSchema(ma.Schema):
 
 
 class ResetPasswordTokenSchema(ma.Schema):
-    new_password = fields.Str(required=True, validate=validate.Length(max=255))
+    new_password = fields.String(required=True, validate=validate.Length(max=255))
 
     class Meta:
         unknown = EXCLUDE
 
 
 class RegisterSchema(Schema):
-    name = fields.Str(required=True, validate=validate.Length(min=1, max=300))
+    name = fields.String(required=True, validate=validate.Length(min=1, max=300))
     email = fields.Email(required=True)
-    password = fields.Str(required=True, validate=validate.Length(max=255, min=8))
+    password = fields.String(required=True, validate=validate.Length(max=255, min=8))
 
 
 class LoginSchema(Schema):
     email = fields.Email(required=True)
-    password = fields.Str(required=True, validate=validate.Length(max=255))
+    password = fields.String(required=True, validate=validate.Length(max=255))
     remember_me = fields.Boolean(required=True)
 
     class Meta:

@@ -21,7 +21,8 @@ dependencies = [
     "marshmallow-sqlalchemy",
     "pyjwt",
     "Flask-Mail",
-    "gunicorn"
+    "gunicorn",
+    "apiflask"
 ]
 
 [project.optional-dependencies]

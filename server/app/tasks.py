@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from apiflask import APIBlueprint
 from flask import Blueprint, abort, request
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
@@ -10,7 +11,7 @@ from .database import db
 from .models import Task
 from .schemas import CreateTaskSchema, TaskSchema
 
-bp = Blueprint("tasks", __name__, url_prefix="/api/tasks")
+bp = APIBlueprint("tasks", __name__, url_prefix="/api/tasks")
 
 
 @bp.get("/list")

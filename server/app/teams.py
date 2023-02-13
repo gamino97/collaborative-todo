@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from apiflask import APIBlueprint
 from flask import Blueprint, abort, request
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
@@ -9,7 +10,7 @@ from .database import db
 from .models import Team, User
 from .schemas import JoinTeamSchema, TeamSchema
 
-bp = Blueprint("teams", __name__, url_prefix="/api/teams")
+bp = APIBlueprint("teams", __name__, url_prefix="/api/teams")
 
 
 @bp.post("/create")
