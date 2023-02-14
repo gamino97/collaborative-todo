@@ -4,10 +4,14 @@ services:
   db:
     image: postgres:15.1-alpine
     volumes:
-      - db-data:/var/lib/postgres/data/
+      - db-data-test:/var/lib/postgres/data/
     ports:
       - "5432:5432"
-    env_file: ./server/.env
+    env_file: ./server/.env.dev
+
+networks:
+  default:
+    name: collaborative-todo-project-dev
 
 volumes:
-  db-data:
+  db-data-test:

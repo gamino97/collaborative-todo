@@ -9,5 +9,9 @@ services:
       - "5433:5432"
     env_file: ./server/.env.test
 
+networks:
+  default:
+    name: collaborative-todo-project-test
+
 volumes:
   db-data-test:
