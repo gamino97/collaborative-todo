@@ -14,17 +14,17 @@ from .database import db
 
 class User(UserMixin, db.Model):
     __tablename__ = "user_table"
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(UUID(as_uuid=True), default=uuid4)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid4, nullable=False)
     name = db.Column(db.String(300), nullable=False)
-    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now())
-    email = db.Column(db.String(255), unique=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     username = db.Column(db.String(255), unique=True, nullable=True)
     password = db.Column(db.String(255), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team_table.id"), nullable=True)
     team = db.relationship("Team", backref="users")
-    active = db.Column(db.Boolean())
+    active = db.Column(db.Boolean(), nullable=False)
 
     def get_reset_token(self, expires_sec=1800):
         return jwt.encode(

@@ -11,6 +11,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.schemas import (
     LoginSchema,
+    LogoutSchema,
+    RegisterOutput,
     RegisterSchema,
     ResetPasswordSchema,
     ResetPasswordTokenSchema,
@@ -25,30 +27,22 @@ bp = APIBlueprint("auth", __name__, url_prefix="/api/auth")
 
 
 @bp.post("/register")
-def register() -> ResponseReturnValue:
-    request_data = request.get_json()
+@bp.input(RegisterSchema)
+@bp.output(UserSchema, status_code=201)
+@bp.doc(responses={400: "Email already registered"})
+def register(data) -> ResponseReturnValue:
+    email: str = data["email"]
+    password: str = data["password"]
+    name: str = data["name"]
+    user = User(name=name, email=email, password=generate_password_hash(password, method="sha256"), active=True)
     try:
-        result = RegisterSchema().load(request_data)
-    except ValidationError as err:
-        abort(400, description=err.messages.copy())
-    else:
-        email: str = result["email"]
-        password: str = result["password"]
-        name: str = result["name"]
-        user = User(name=name, email=email, password=generate_password_hash(password, method="sha256"), active=True)
-        try:
-            db.session.add(user)
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            abort(400, description={"email": ["Email is already registered."]})
-        login_user(user)
-        user_schema = UserSchema()
-        response = {
-            "message": f"User {user.name} registered successfully",
-            "user": user_schema.dump(user),
-        }
-        return response, 201
+        db.session.add(user)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, message="Email is already registered.")
+    login_user(user)
+    return user
 
 
 @bp.post("/login")
@@ -83,9 +77,10 @@ def login(data) -> ResponseReturnValue:
 
 
 @bp.post("/logout")
+@bp.output(LogoutSchema)
 def logout() -> ResponseReturnValue:
     logout_user()
-    return {"message": "Logged Out Successfully"}, 200
+    return {"message": "Logged Out Successfully"}
 
 
 @bp.route("/user")

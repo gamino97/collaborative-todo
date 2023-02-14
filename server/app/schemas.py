@@ -1,5 +1,6 @@
 # pyright: reportOptionalCall=false
 from apiflask import Schema, fields
+from apiflask.validators import Length
 from marshmallow import EXCLUDE, validate
 
 from .ma import ma
@@ -20,8 +21,8 @@ class UserSchema(ma.SQLAlchemySchema):
 
 
 class CreateTaskSchema(ma.Schema):
-    title = fields.String(required=True, validate=[validate.Length(max=255)])
-    description = fields.String(required=False, validate=[validate.Length(max=1024)])
+    title = fields.String(required=True, validate=Length(max=255))
+    description = fields.String(required=False, validate=Length(max=1024))
     team = fields.Boolean(load_default=False)
 
     class Meta:
@@ -76,9 +77,14 @@ class ResetPasswordTokenSchema(ma.Schema):
 
 
 class RegisterSchema(Schema):
-    name = fields.String(required=True, validate=validate.Length(min=1, max=300))
+    name = fields.String(required=True, validate=Length(min=1, max=300))
     email = fields.Email(required=True)
-    password = fields.String(required=True, validate=validate.Length(max=255, min=8))
+    password = fields.String(required=True, validate=Length(max=255, min=8))
+
+
+class RegisterOutput(Schema):
+    message = fields.String()
+    user = UserSchema()
 
 
 class LoginSchema(Schema):
@@ -88,3 +94,7 @@ class LoginSchema(Schema):
 
     class Meta:
         unknown = EXCLUDE
+
+
+class LogoutSchema(Schema):
+    message = fields.String()
