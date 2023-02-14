@@ -57,23 +57,7 @@ def login(data) -> ResponseReturnValue:
     if not user or not check_password_hash(user.password, password):
         abort(400, message="Please check your login details and try again.")
     login_user(user, remember=remember_me)
-    user_schema = UserSchema()
     return user
-    # request_data = request.get_json()
-    # try:
-    #     result = LoginSchema().load(request_data)
-    # except ValidationError as err:
-    #     abort(400, detail=err.messages.copy())
-    # else:
-    #     email: str = result["email"]
-    #     password: str = result["password"]
-    #     remember_me: bool = result["remember_me"]
-    #     user = User.query.filter(User.email == email).first()
-    #     if not user or not check_password_hash(user.password, password):
-    #         abort(400, detail="Please check your login details and try again.")
-    #     login_user(user, remember=remember_me)
-    #     user_schema = UserSchema()
-    #     return user_schema.dump(user), 200
 
 
 @bp.post("/logout")
@@ -84,11 +68,11 @@ def logout() -> ResponseReturnValue:
 
 
 @bp.route("/user")
+@bp.output(UserSchema)
 def get_user() -> ResponseReturnValue:
     if current_user.is_anonymous:
-        return {}, 200
-    user_schema = UserSchema()
-    return user_schema.dump(current_user), 200
+        return {}
+    return current_user
 
 
 # https://medium.com/@stevenrmonaghan/password-reset-with-flask-mail-protocol-ddcdfc190968
