@@ -1,6 +1,7 @@
-import http
+from http import HTTPStatus
 
 from apiflask import APIBlueprint, abort
+from apiflask.fields import String
 from flask import current_app, request
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_user, logout_user
@@ -95,46 +96,43 @@ If you did not make this request then simply ignore this email and no changes wi
 
 
 @bp.post("/reset-password")
-def reset_password() -> ResponseReturnValue:
+@bp.input(ResetPasswordSchema)
+@bp.output({"message": String()})
+@bp.doc(responses=[401])
+def reset_password(data) -> ResponseReturnValue:
     if current_user.is_authenticated:
-        abort(http.HTTPStatus.UNAUTHORIZED)
-    request_data = request.get_json()
-    try:
-        result = ResetPasswordSchema().load(request_data)
-    except ValidationError as err:
-        return abort(400, description=err.messages.copy())
-    email: str = result["email"]
+        abort(HTTPStatus.UNAUTHORIZED)
+    email: str = data["email"]
     user = User.query.filter(User.email == email).first()
     if user:
         send_reset_email(user)
     return {
         "message": """If your account exists, a new password was sent to your registered email address.
-If you do not receive an email, it may be because you are banned, your account is not activated, or you are not allowed to change your password. Contact admin if any of those reasons apply. Also, check your spam filter."""
+    If you do not receive an email, it may be because you are banned, your account is not activated, or you are not allowed to change your password. Contact admin if any of those reasons apply. Also, check your spam filter."""
     }
 
 
 @bp.get("/reset-password-token/<token>")
+@bp.output({"message": String()})
 def reset_password_token_verify(token: str) -> ResponseReturnValue:
     if current_user.is_authenticated:
-        return {"valid": False}
+        abort(HTTPStatus.UNAUTHORIZED)
     user = User.verify_reset_token(token)
     if user is None:
-        return {"valid": "That is an invalid or expired token"}
-    return {"valid": True}
+        return {"message": "That is an invalid or expired token"}
+    return {"message": "Valid Token"}
 
 
 @bp.post("/reset-password-token/<token>")
-def reset_password_token(token) -> ResponseReturnValue:
+@bp.input(ResetPasswordTokenSchema)
+@bp.output({"message": String()})
+def reset_password_token(token, data) -> ResponseReturnValue:
     if current_user.is_authenticated:
-        abort(400, description={"message": False})
+        abort(HTTPStatus.UNAUTHORIZED)
     user = User.verify_reset_token(token)
     if user is None:
-        abort(400, description={"message": "That is an invalid or expired token"})
-    try:
-        result = ResetPasswordTokenSchema().load(request.get_json())
-    except ValidationError as err:
-        return abort(400, description=err.messages.copy())
-    hashed_password = generate_password_hash(result["new_password"], method="sha256")
+        return {"message": "That is an invalid or expired token"}
+    hashed_password = generate_password_hash(data["new_password"], method="sha256")
     user.password = hashed_password
     db.session.commit()
     return {"message": "Your password has been updated! You are now able to log in"}

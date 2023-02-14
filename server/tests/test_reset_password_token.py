@@ -24,8 +24,7 @@ def test_reset_password_token_verify_authenticated_user(app, user: User):
     request_data = {"new_password": "my_new_strong_and_complicated_password"}
     with app.test_client(user=user) as client:
         response = client.post(url_for("auth.reset_password_token", token=access_token), json=request_data)
-        assert response.status_code == 400
-        assert response.json["description"] == {"message": False}
+        assert response.status_code == 401
         # Verify that we did not update the password
         db.session.refresh(user)
         assert not check_password_hash(user.password, request_data["new_password"])
@@ -39,8 +38,8 @@ def test_reset_password_token_expired_token(client, user: User):
     with freeze_time(fake_time):
         assert datetime.now() == fake_time
         response = client.post(url_for("auth.reset_password_token", token=access_token), json=request_data)
-    assert response.status_code == 400
-    assert response.json["description"] == {"message": "That is an invalid or expired token"}
+    assert response.status_code == 200
+    assert response.json == {"message": "That is an invalid or expired token"}
     # Verify that we did not update the password
     db.session.refresh(user)
     assert not check_password_hash(user.password, request_data["new_password"])
@@ -49,5 +48,5 @@ def test_reset_password_token_expired_token(client, user: User):
 def test_reset_password_token_invalid_token(client):
     request_data = {"new_password": "my_new_strong_and_complicated_password"}
     response = client.post(url_for("auth.reset_password_token", token="token"), json=request_data)
-    assert response.status_code == 400
-    assert response.json["description"] == {"message": "That is an invalid or expired token"}
+    assert response.status_code == 200
+    assert response.json == {"message": "That is an invalid or expired token"}

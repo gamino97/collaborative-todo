@@ -10,15 +10,14 @@ def test_reset_password_token_verify(client, user: User):
     access_token = user.get_reset_token()
     response = client.get(url_for("auth.reset_password_token_verify", token=access_token))
     assert response.status_code == 200
-    assert response.json == {"valid": True}
+    assert response.json == {"message": "Valid Token"}
 
 
 def test_reset_password_token_verify_authenticated_user(app, user: User):
     access_token = user.get_reset_token()
     with app.test_client(user=user) as client:
         response = client.get(url_for("auth.reset_password_token_verify", token=access_token))
-        assert response.status_code == 200
-        assert response.json == {"valid": False}
+    assert response.status_code == 401
 
 
 def test_reset_password_token_expired_token(client, user: User):
@@ -29,10 +28,10 @@ def test_reset_password_token_expired_token(client, user: User):
         assert datetime.now() == fake_time
         response = client.get(url_for("auth.reset_password_token_verify", token=access_token))
     assert response.status_code == 200
-    assert response.json == {"valid": "That is an invalid or expired token"}
+    assert response.json == {"message": "That is an invalid or expired token"}
 
 
 def test_reset_password_token_invalid_token(client):
     response = client.get(url_for("auth.reset_password_token_verify", token="token"))
     assert response.status_code == 200
-    assert response.json == {"valid": "That is an invalid or expired token"}
+    assert response.json == {"message": "That is an invalid or expired token"}

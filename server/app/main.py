@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from apiflask import APIFlask
+from apiflask.fields import String
 from flask import Flask, abort
 from flask.typing import ResponseReturnValue
 from flask_login import LoginManager
@@ -92,6 +93,7 @@ def create_app(env_file=None, extra_config: dict | None = None):
         return app.send_static_file("index.html")
 
     @app.get("/api/getcsrf")
+    @app.output({"detail": String()})
     def get_csrf() -> ResponseReturnValue:
         token = generate_csrf()
         return {"detail": "CSRF cookie set"}, 200, {"X-CSRFToken": token}
