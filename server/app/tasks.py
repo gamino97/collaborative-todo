@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
-from apiflask import APIBlueprint
-from flask import Blueprint, abort, request
+from apiflask import APIBlueprint, abort
+from apiflask.fields import String
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
-from marshmallow import ValidationError
 from sqlalchemy import or_
 
 from .database import db
@@ -15,35 +14,39 @@ bp = APIBlueprint("tasks", __name__, url_prefix="/api/tasks")
 
 
 @bp.get("/list")
+@bp.output(TaskSchema(many=True))
+@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
 @login_required
 def list_tasks() -> ResponseReturnValue:
     tasks = Task.query.filter(
-        or_(Task.author == current_user, Task.team_id == current_user.team_id), Task.deleted == False
+        or_(Task.author == current_user, Task.team_id == current_user.team_id),
+        Task.deleted == False,
     )
-    task_schema = TaskSchema(many=True)
-    return task_schema.dump(tasks)
+    return tasks
 
 
 @bp.post("/create")
+@bp.input(CreateTaskSchema)
+@bp.output(TaskSchema, status_code=201)
+@bp.doc(
+    responses={
+        400: "Trying to create a task in a team the user is not part of",
+        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
+    }
+)
 @login_required
-def create_task() -> ResponseReturnValue:
-    request_data = request.get_json()
-    try:
-        result = CreateTaskSchema().load(request_data)
-    except ValidationError as err:
-        abort(400, err.messages.copy())
-    else:
-        title = result.get("title")
-        description = result.get("description", "")
-        team = result.get("team", False)
-        task = Task(title=title, description=description, author=current_user)
-        if team:
-            if not current_user.team_id:
-                abort(400, description="This user is not part of any team.")
-            task.team_id = current_user.team_id
-        db.session.add(task)
-        db.session.commit()
-        return TaskSchema().dump(task), 201
+def create_task(data) -> ResponseReturnValue:
+    title = data.get("title")
+    description = data.get("description", "")
+    team = data.get("team", False)
+    task = Task(title=title, description=description, author=current_user)
+    if team:
+        if not current_user.team_id:
+            abort(400, message="This user is not part of any team.")
+        task.team_id = current_user.team_id
+    db.session.add(task)
+    db.session.commit()
+    return task
 
 
 def verify_is_task_editable(task: Task):
@@ -51,37 +54,45 @@ def verify_is_task_editable(task: Task):
     if message == "authorized":
         return
     if message == "deleted":
-        abort(404, description="Task does not exist")
+        abort(404)
     if message == "unauthorized":
-        abort(HTTPStatus.FORBIDDEN, description="You are not authorized to modify this task")
+        abort(HTTPStatus.FORBIDDEN, message="You are not authorized to modify this task")
 
 
-@bp.put("/update/<int:task_id>")
+@bp.patch("/update/<int:task_id>")
+@bp.input(TaskSchema(partial=True))
+@bp.output(TaskSchema)
+@bp.doc(
+    responses={
+        HTTPStatus.FORBIDDEN.value: HTTPStatus.FORBIDDEN.phrase,
+        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
+    }
+)
 @login_required
-def update_task(task_id) -> ResponseReturnValue:
+def update_task(task_id, data) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)
     verify_is_task_editable(task)
-    request_data = request.get_json()
-    task_schema = TaskSchema()
-    try:
-        result = task_schema.load(request_data)
-    except ValidationError as err:
-        abort(400, err.messages.copy())
-    else:
-        title = result.get("title")
-        description = result.get("description")
-        done = result.get("done")
-        if task.title != title:
-            task.title = title
-        if task.description != description:
-            task.description = description
-        if task.done != done:
-            task.done = done
-        db.session.commit()
-        return task_schema.dump(task), 200
+    title = data.get("title")
+    description = data.get("description")
+    done = data.get("done")
+    if task.title != title:
+        task.title = title
+    if task.description != description:
+        task.description = description
+    if task.done != done:
+        task.done = done
+    db.session.commit()
+    return task
 
 
 @bp.post("/delete/<int:task_id>")
+@bp.output({"message": String()})
+@bp.doc(
+    responses={
+        HTTPStatus.FORBIDDEN.value: HTTPStatus.FORBIDDEN.phrase,
+        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
+    }
+)
 @login_required
 def delete_task(task_id) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)

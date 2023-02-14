@@ -31,7 +31,6 @@ def test_delete_task_with_unauthorized_user(app, client, user):
 
     # check response
     assert response.status_code == 401
-    assert "description" in response.json
 
 
 def test_delete_task_with_wrong_team_membership(app, user):
@@ -48,6 +47,7 @@ def test_delete_task_with_wrong_team_membership(app, user):
         response = client.post(url_for("tasks.delete_task", task_id=task.id))
     # check response
     assert response.status_code == 403
+    assert response.json["message"] == "You are not authorized to modify this task"
 
 
 def test_delete_task_with_wrong_author(app, user):
@@ -62,6 +62,7 @@ def test_delete_task_with_wrong_author(app, user):
         response = client.post(url_for("tasks.delete_task", task_id=task.id))
     # check response
     assert response.status_code == 403
+    assert response.json["message"] == "You are not authorized to modify this task"
 
 
 def test_delete_task_with_not_found_task(app, user):
@@ -75,7 +76,7 @@ def test_delete_task_with_not_found_task(app, user):
 
     # check response
     assert response.status_code == 404
-    assert "description" in response.json
+    assert "message" in response.json
 
 
 def test_delete_task_with_deleted_task(app, client, user):
@@ -87,4 +88,4 @@ def test_delete_task_with_deleted_task(app, client, user):
         response = client.post(url_for("tasks.delete_task", task_id=task.id))
     # check response
     assert response.status_code == 404
-    assert "description" in response.json
+    assert "message" in response.json

@@ -58,9 +58,9 @@ def test_create_task_with_invalid_data(app, user):
 
     # Assert
     # Verifica que se requiere un título
-    assert response.status_code == 400
+    assert response.status_code == 422
     data = response.get_json()
-    assert "title" in data["description"]
+    assert "title" in response.json["detail"]["json"]
 
 
 def test_create_task_with_team_without_team_membership(app, user):
@@ -73,7 +73,7 @@ def test_create_task_with_team_without_team_membership(app, user):
     # Verifica que se devuelve un error de equipo
     assert response.status_code == 400
     data = response.get_json()
-    assert data["description"] == "This user is not part of any team."
+    assert data["message"] == "This user is not part of any team."
 
 
 def test_create_task_with_unauthenticated_user(app, user):
@@ -84,5 +84,4 @@ def test_create_task_with_unauthenticated_user(app, user):
     # Assert
     # Verifica que se devuelve un error de autorización
     assert response.status_code == 401
-    data = response.get_json()
-    assert "description" in data
+    assert response.json["message"] == "Unauthorized"
