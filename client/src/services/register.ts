@@ -12,9 +12,7 @@ export interface RegisterSuccessResponse {
   user: User;
 }
 
-export async function registerUser(
-  data: RegisterData
-): Promise<RegisterSuccessResponse> {
+export async function registerUser(data: RegisterData): Promise<User> {
   const res = await apiClient.post("/auth/register", { ...data });
   return res.data;
 }

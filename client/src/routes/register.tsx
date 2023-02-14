@@ -30,9 +30,9 @@ function Register() {
   const onSubmit: SubmitHandler<RegisterData> = async (data) => {
     try {
       const res = await registerUser(data);
-      setUser(res.user);
+      setUser(res);
       toast({
-        title: res.message,
+        title: `User ${res.name} registered successfully`,
         status: "success",
         duration: 2000,
         position: "top",
@@ -41,19 +41,23 @@ function Register() {
     } catch (e) {
       console.error(e);
       if (isAxiosError(e)) {
-        const err = e as AxiosError;
-        // @ts-expect-error Fix later
-        Object.entries(err.response.data).forEach(([field, message]) => {
-          if (Array.isArray(message)) {
-            message.forEach((m) => {
-              // @ts-expect-error This should be the same type as RegisterData
-              setError(field, { type: "custom", message: m });
-            });
-          } else if (typeof message === "string") {
-            // @ts-expect-error This should be the same type as RegisterData
-            setError(field, { type: "custom", message: message });
+        const err = e as AxiosError<{
+          message: string;
+          detail: Record<string, Record<keyof Partial<RegisterData>, string[]>>;
+        }>;
+        if (err.response) {
+          if (err.response.status === 400) {
+            return toast({ title: err.response.data.message });
           }
-        });
+          Object.entries(err.response.data.detail["json"]).forEach(
+            ([field, message]) => {
+              message.forEach((m) => {
+                // @ts-expect-error This should be the same type as RegisterData
+                setError(field, { type: "custom", message: m });
+              });
+            }
+          );
+        }
       }
     }
   };
