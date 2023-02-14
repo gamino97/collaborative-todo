@@ -40,7 +40,7 @@ def create_team(data) -> ResponseReturnValue:
 
 @bp.get("/myteam")
 @bp.output(TeamSchema)
-@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
+@bp.doc(responses=[HTTPStatus.UNAUTHORIZED.value])
 @login_required
 def my_team() -> ResponseReturnValue:
     user = current_user
@@ -51,7 +51,7 @@ def my_team() -> ResponseReturnValue:
 
 @bp.post("/<int:team_id>/leave")
 @bp.output({"message": String()})
-@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
+@bp.doc(responses=[HTTPStatus.UNAUTHORIZED.value])
 @login_required
 def leave_team(team_id) -> ResponseReturnValue:
     team: Team = db.get_or_404(Team, team_id)

@@ -15,7 +15,7 @@ bp = APIBlueprint("tasks", __name__, url_prefix="/api/tasks")
 
 @bp.get("/list")
 @bp.output(TaskSchema(many=True))
-@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
+@bp.doc(responses=[HTTPStatus.UNAUTHORIZED.value])
 @login_required
 def list_tasks() -> ResponseReturnValue:
     tasks = Task.query.filter(
@@ -62,12 +62,7 @@ def verify_is_task_editable(task: Task):
 @bp.patch("/update/<int:task_id>")
 @bp.input(TaskSchema(partial=True))
 @bp.output(TaskSchema)
-@bp.doc(
-    responses={
-        HTTPStatus.FORBIDDEN.value: HTTPStatus.FORBIDDEN.phrase,
-        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
-    }
-)
+@bp.doc(responses=[HTTPStatus.FORBIDDEN.value, HTTPStatus.UNAUTHORIZED.value])
 @login_required
 def update_task(task_id, data) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)
