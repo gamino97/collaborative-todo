@@ -23,7 +23,7 @@ def test_create_team_with_authenticated_user(app, user, team_data):
 def test_create_team_with_unauthenticated_user(client, user, team_data):
     response = client.post(url_for("teams.create_team"), json=team_data)
     assert response.status_code == 401
-    assert "code" in response.json
+    assert "message" in response.json
 
 
 def test_create_team_with_user_already_associated_to_team(app, user, team_data):
@@ -35,12 +35,12 @@ def test_create_team_with_user_already_associated_to_team(app, user, team_data):
     with app.test_client(user=user) as client:
         response = client.post(url_for("teams.create_team"), json=team_data)
     assert response.status_code == 400
-    assert response.json["description"] == "Currently you are associated with a team, abandon it to join this team."
+    assert response.json["message"] == "Currently you are associated with a team, abandon it to join this team."
 
 
 def test_create_team_with_invalid_data(app, user, team_data):
     team_data["name"] = ""
     with app.test_client(user=user) as client:
         response = client.post(url_for("teams.create_team"), json=team_data)
-    assert response.status_code == 400
-    assert "name" in response.json["description"]
+    assert response.status_code == 422
+    assert "name" in response.json["detail"]["json"]

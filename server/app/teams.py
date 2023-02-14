@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from apiflask import APIBlueprint
-from flask import Blueprint, abort, request
+from apiflask import APIBlueprint, abort
+from apiflask.fields import String
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 from marshmallow import ValidationError
@@ -14,65 +14,71 @@ bp = APIBlueprint("teams", __name__, url_prefix="/api/teams")
 
 
 @bp.post("/create")
+@bp.input(TeamSchema)
+@bp.output(TeamSchema, status_code=HTTPStatus.CREATED.value)
+@bp.doc(
+    responses={
+        HTTPStatus.BAD_REQUEST.value: "User associated with a team",
+        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
+    }
+)
 @login_required
-def create_team() -> ResponseReturnValue:
+def create_team(data) -> ResponseReturnValue:
     user: User = current_user
     if user.team_id:
-        return abort(
+        abort(
             HTTPStatus.BAD_REQUEST,
-            description="Currently you are associated with a team, abandon it to join this team.",
+            message="Currently you are associated with a team, abandon it to join this team.",
         )
-    request_data = request.get_json()
-    team_schema = TeamSchema()
-    try:
-        result = team_schema.load(request_data)
-    except ValidationError as err:
-        abort(HTTPStatus.BAD_REQUEST, description=err.messages.copy())
-    else:
-        name: str = result.get("name")
-        team = Team(name=name)
-        db.session.add(team)
-        team.users.append(current_user)
-        db.session.commit()
-        return team_schema.dump(team), 201
+    name: str = data.get("name")
+    team = Team(name=name)
+    db.session.add(team)
+    team.users.append(current_user)
+    db.session.commit()
+    return team
 
 
 @bp.get("/myteam")
+@bp.output(TeamSchema)
+@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
 @login_required
 def my_team() -> ResponseReturnValue:
     user = current_user
     if not user.team_id:
-        return {"message": "No team is associated with this user"}
-    team_schema = TeamSchema()
-    return team_schema.dump(current_user.team)
+        return {}
+    return current_user.team
 
 
 @bp.post("/<int:team_id>/leave")
+@bp.output({"message": String()})
+@bp.doc(responses={HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase})
 @login_required
 def leave_team(team_id) -> ResponseReturnValue:
     team: Team = db.get_or_404(Team, team_id)
     if current_user.team_id == team.id:
         team.users.remove(current_user)
         db.session.commit()
-    return {"message": "You successfully leave the team"}, 200
+    return {"message": "You successfully leave the team"}
 
 
 @bp.post("/join")
+@bp.input(JoinTeamSchema)
+@bp.output(TeamSchema)
+@bp.doc(
+    responses={
+        HTTPStatus.BAD_REQUEST.value: "User associated with a team",
+        HTTPStatus.NOT_FOUND.value: HTTPStatus.NOT_FOUND.phrase,
+        HTTPStatus.UNAUTHORIZED.value: HTTPStatus.UNAUTHORIZED.phrase,
+    }
+)
 @login_required
-def join_team() -> ResponseReturnValue:
+def join_team(data) -> ResponseReturnValue:
     if current_user.team_id:
-        return {"message": "Currently you are associated with a team, abandon it to join this team."}, 400
-    # team: Team | None = db.get(Team, team_id)
-    join_team_schema = JoinTeamSchema()
-    request_data = request.get_json()
-    try:
-        result = join_team_schema.load(request_data)
-    except ValidationError as err:
-        return abort(HTTPStatus.BAD_REQUEST, description=err.messages.copy())
-    team_code = str(result.get("code"))
+        abort(400, message="Currently you are associated with a team, abandon it to join this team.")
+    team_code = str(data.get("code"))
     team: Team | None = Team.query.filter(Team.uuid == team_code).one_or_none()
     if team is None:
-        return abort(404, description="Team does not exist")
+        abort(404)
     team.users.append(current_user)
     db.session.commit()
-    return {"message": f'You successfully joined to "{team.name}"'}, 200
+    return team

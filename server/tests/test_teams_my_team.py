@@ -30,18 +30,10 @@ def test_my_team_with_valid_user(app, user):
 
 def test_my_team_with_invalid_user(app, user):
     with app.test_client(user=user) as client:
-        # Realizar una solicitud GET al endpoint "myteam"
         response = client.get(url_for("teams.my_team"))
 
-    # Verificar que la respuesta tenga un estatus 200 (OK)
     assert response.status_code == 200
-
-    # Deserializar la respuesta como JSON
-    data = json.loads(response.data.decode())
-
-    # Verificar que la respuesta contenga un mensaje de error
-    assert "message" in data
-    assert data["message"] == "No team is associated with this user"
+    assert response.json == {}
 
 
 def test_my_team_without_login(client):
