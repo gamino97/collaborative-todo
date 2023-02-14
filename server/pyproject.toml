@@ -41,10 +41,20 @@ test = [
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+  | migrations
+)/
+'''
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+skip = [".gitignore", "migrations"]
 
 [tool.pylint.MESSAGE_CONTROL]
 disable = [
