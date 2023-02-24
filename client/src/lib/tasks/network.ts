@@ -33,7 +33,7 @@ export const create: TaskCreate = async (data, team) => {
 
 export const update: TaskUpdate = async (task) => {
   const { title, description, done } = task;
-  const res = await apiClient.post(`/tasks/update/${task.id}`, {
+  const res = await apiClient.patch(`/tasks/update/${task.id}`, {
     title,
     description,
     done,

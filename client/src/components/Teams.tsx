@@ -124,7 +124,7 @@ export default function Teams() {
   const { isLoading, error, data: team, invalidateTeamQuery } = useTeam();
   if (isLoading || !team) return <Fallback />;
   if (error instanceof Error) return <QueryError error={error} />;
-  if (team.message) return <NoTeam />;
+  if (Object.keys(team).length === 0) return <NoTeam />;
   return (
     <Box>
       <Center>

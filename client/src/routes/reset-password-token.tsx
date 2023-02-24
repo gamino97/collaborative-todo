@@ -17,7 +17,11 @@ import QueryError from "components/QueryError";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { resetPassword, useResetPasswordToken } from "services/user";
+import {
+  resetPassword,
+  useResetPasswordToken,
+  ValidateResetPasswordTokenEnum,
+} from "services/user";
 
 interface ForgotPasswordFields {
   newPassword: string;
@@ -43,11 +47,11 @@ function ResetPasswordToken() {
     if (
       !toast.isActive(id) &&
       isValidToken &&
-      typeof isValidToken.valid === "string"
+      isValidToken.message === ValidateResetPasswordTokenEnum.Invalid
     ) {
       toast({
         id,
-        title: isValidToken.valid,
+        title: isValidToken.message,
         status: "warning",
         duration: 2000,
         position: "top",
@@ -57,9 +61,8 @@ function ResetPasswordToken() {
   const navigate = useNavigate();
   if (isLoading || !isValidToken) return <Fallback />;
   if (error instanceof Error) return <QueryError error={error} />;
-  if (!isValidToken.valid) return <Navigate to="/login" replace={true} />;
-  if (typeof isValidToken.valid === "string")
-    return <Navigate to={"/login"} replace={true} />;
+  if (isValidToken.message === ValidateResetPasswordTokenEnum.Invalid)
+    return <Navigate to="/login" replace={true} />;
   const onSubmit: SubmitHandler<ForgotPasswordFields> = async (data) => {
     try {
       const response = await resetPassword({
@@ -74,26 +77,21 @@ function ResetPasswordToken() {
       });
       navigate("/login");
     } catch (e) {
-      interface Error {
-        new_password?: string[];
-        message?: false | string;
+      interface ResponseError {
+        detail: { json: Partial<Record<keyof ForgotPasswordFields, string[]>> };
+        message: string;
       }
-      const error = e as AxiosError<Error>;
+      const error = e as AxiosError<ResponseError>;
       const data = error.response?.data;
       console.error(error);
       if (data) {
-        if (data.new_password) {
+        data.detail.json.newPassword?.forEach((err) => {
           setError("newPassword", {
             type: "manual",
-            message: data.new_password[0],
+            message: err,
           });
-        }
-        if (typeof data.message === "string") {
-          setMessage(data.message);
-        }
-        if (typeof data.message === "boolean") {
-          navigate("/");
-        }
+        });
+        setMessage(data.message);
       }
     }
   };

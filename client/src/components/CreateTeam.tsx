@@ -15,12 +15,13 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { createTeam } from "services/team";
+import { createTeam, useTeam } from "services/team";
 
 interface CreateTeamForm {
   name: string;
 }
 export function CreateTeam() {
+  const { setTeam } = useTeam();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const methods = useForm<CreateTeamForm>();
   const {
@@ -39,6 +40,7 @@ export function CreateTeam() {
         duration: 2000,
         position: "top",
       });
+      setTeam(newTeam);
     } catch (e) {
       console.error(e);
       toast({

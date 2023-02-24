@@ -34,10 +34,10 @@ export function JoinTeam() {
   const toast = useToast();
   const onSubmit: SubmitHandler<JoinTeamForm> = async (data) => {
     try {
-      const response = await joinTeam({ code: data.code });
+      const responseTeam = await joinTeam({ code: data.code });
       invalidateTeamQuery();
       toast({
-        title: response.message,
+        title: `You successfully joined to '${responseTeam.name}'`,
         status: "success",
         duration: 2000,
         position: "top",

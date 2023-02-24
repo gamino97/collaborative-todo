@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "lib/apiClient";
 import { CreateTeamData, Team } from "services/types";
+import Teams from "routes/teams";
 
 async function createTeam({ data }: CreateTeamData): Promise<Team> {
   const response = await apiClient.post("/teams/create", { ...data });
@@ -22,7 +23,10 @@ function useTeam() {
     queryFn: fetchTeam,
     staleTime: Infinity,
   });
-  return { ...query, invalidateTeamQuery };
+  const setTeam = (data: Team) => {
+    queryClient.setQueryData(["team"], { ...data });
+  };
+  return { ...query, invalidateTeamQuery, setTeam };
 }
 
 interface LeaveJoinTeam {
@@ -43,7 +47,7 @@ async function leaveTeam({
 interface JoinTeam {
   code: string;
 }
-async function joinTeam({ code }: JoinTeam): Promise<LeaveTeamResponse> {
+async function joinTeam({ code }: JoinTeam): Promise<Team> {
   const response = await apiClient.post(`/teams/join`, { code });
   return response.data;
 }

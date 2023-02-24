@@ -37,7 +37,7 @@ export async function createTask(
   mode: Mode,
   data: TaskFormValues,
   team: boolean
-) {
+): Promise<Task> {
   let create: TaskCreate;
   if (mode === "demo") {
     ({ create } = await import("lib/tasks/demo"));

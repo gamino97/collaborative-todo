@@ -21,7 +21,6 @@ function useTasks(mode: Mode, team?: Team) {
     ],
     queryFn: () => getTasks(mode, q, team),
     networkMode: mode === "demo" ? "always" : "online",
-    staleTime: 1000 * 60,
   });
   const toast = useToast();
 
@@ -30,7 +29,7 @@ function useTasks(mode: Mode, team?: Team) {
     team: boolean
   ) => {
     await createTask(mode, taskFormData, team);
-    queryClient.invalidateQueries([mode, "tasks", "list"]);
+    await queryClient.invalidateQueries([mode, "tasks", "list"]);
     toast({
       title: `Task "${taskFormData.title}" created successfully`,
       status: "success",
@@ -41,17 +40,17 @@ function useTasks(mode: Mode, team?: Team) {
 
   const handleDeleteTask: onDeleteTask = async (data) => {
     await deleteTask(mode, data);
-    queryClient.invalidateQueries([mode, "tasks"]);
+    await queryClient.invalidateQueries([mode, "tasks"]);
   };
 
   const handleUpdateTask = async (data: Task) => {
     await updateTask(mode, data);
-    queryClient.invalidateQueries([mode, "tasks"]);
+    await queryClient.invalidateQueries([mode, "tasks"]);
   };
 
   const handleDoneTask: onDoneTask = async (data) => {
     await updateTask(mode, { ...data, done: !data.done });
-    queryClient.invalidateQueries([mode, "tasks"]);
+    await queryClient.invalidateQueries([mode, "tasks"]);
   };
 
   return {

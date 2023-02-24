@@ -48,9 +48,16 @@ async function requestResetPassword({
 interface ValidateResetPasswordTokenParams {
   token: string | undefined;
 }
+
+export enum ValidateResetPasswordTokenEnum {
+  Valid = "Valid Token",
+  Invalid = "That is an invalid or expired token",
+}
 async function validateResetPasswordToken({
   token,
-}: ValidateResetPasswordTokenParams): Promise<{ valid: string | boolean }> {
+}: ValidateResetPasswordTokenParams): Promise<{
+  message: ValidateResetPasswordTokenEnum;
+}> {
   const response = await apiClient.get(`/auth/reset-password-token/${token}`);
   return response.data;
 }
