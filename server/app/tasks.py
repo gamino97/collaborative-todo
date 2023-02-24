@@ -4,7 +4,7 @@ from apiflask import APIBlueprint, abort
 from apiflask.fields import String
 from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from .database import db
 from .models import Task
@@ -19,7 +19,7 @@ bp = APIBlueprint("tasks", __name__, url_prefix="/api/tasks")
 @login_required
 def list_tasks() -> ResponseReturnValue:
     tasks = Task.query.filter(
-        or_(Task.author == current_user, Task.team_id == current_user.team_id),
+        or_(Task.author == current_user, and_(Task.team_id != None, Task.team_id == current_user.team_id)),
         Task.deleted == False,
     )
     return tasks
