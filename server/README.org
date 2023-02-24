@@ -28,4 +28,4 @@ flask --app app.main db upgrade
 #+end_src
 
 * Known Bugs
-+ [ ] Register crashes when input an email already registered
++ [X] Register crashes when input an email already registered

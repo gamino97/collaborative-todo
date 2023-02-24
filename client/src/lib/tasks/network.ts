@@ -43,6 +43,5 @@ export const update: TaskUpdate = async (task) => {
 
 export const erase: TaskDelete = async (task) => {
   const { id } = task;
-  const res = await apiClient.post(`/tasks/delete/${id}`);
-  console.log({ resDelete: res.data });
+  return await apiClient.post(`/tasks/delete/${id}`);
 };

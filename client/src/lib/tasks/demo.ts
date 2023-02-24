@@ -27,6 +27,7 @@ export const create: TaskCreate = async (data) => {
     done: false,
     created_at: now.toJSON(),
     team_id: null,
+    author_id: 1,
   };
   const tasks = await get();
   tasks.unshift(task);
