@@ -2,3 +2,24 @@
 
 * Docker Tutorial for flask, nginx and gunicorn
 https://testdriven.io/blog/dockerizing-flask-with-postgres-gunicorn-and-nginx/
+
+* Getting Started
+** Running locally
++ Go to the project root
+
++ Start docker services
+  #+begin_src bash
+    docker-compose -f docker-compose.yaml up --build -d
+  #+end_src
+
++ Apply migrations to database after all the services are up
+  #+begin_src bash
+    docker exec -it collaborative-todo-project-web-1 flask --app app.main db upgrade
+#+end_src
+
++ Go to http://localhost:1337
+
++ Stop docker services
+  #+begin_src bash
+    docker-compose down -v
+  #+end_src
