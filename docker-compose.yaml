@@ -5,8 +5,6 @@ services:
     image: postgres:15.1-alpine
     volumes:
       - db-data:/var/lib/postgres/data/
-    # ports:
-    #   - "5432:5432"
     expose:
       - 5432
     env_file: ./server/.env.prod
@@ -29,7 +27,6 @@ services:
       - static_volume:/app/server/static
 
   nginx:
-    # build: ./services/nginx
     image: nginx:1.23-alpine
     volumes:
       - static_volume:/app/nginx/static
