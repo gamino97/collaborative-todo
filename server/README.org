@@ -3,12 +3,17 @@
 * Install dependencies
 ** Generate requirements for development
 #+begin_src bash
-  pip-compile --extra test --extra dev -o dev-requirements.txt pyproject.toml
+  pip-compile --extra test --extra dev -o requirements.txt pyproject.toml
+#+end_src
+
+*** Or generate requirements for production
+#+begin_src bash
+  pip-compile -o requirements.txt pyproject.toml
 #+end_src
 
 ** Install dependencies from requirements.txt
 #+begin_src bash
-  pip install -r dev-requirements.txt
+  pip install -r requirements.txt
 #+end_src
 
 * Database
