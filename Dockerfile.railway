@@ -1,5 +1,5 @@
 FROM node:16 AS builderJs
-RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
+RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.11.0
 WORKDIR /app/client
 # pnpm fetch does require only lockfile
 COPY ./client/pnpm-lock.yaml ./
