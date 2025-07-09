@@ -1,4 +1,4 @@
-FROM node:16 AS builderJs
+FROM node:18 AS builderJs
 RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 WORKDIR /app/client
 # pnpm fetch does require only lockfile
