@@ -23,14 +23,14 @@ bp = APIBlueprint("teams", __name__, url_prefix="/api/teams")
     }
 )
 @login_required
-def create_team(data) -> ResponseReturnValue:
+def create_team(json_data) -> ResponseReturnValue:
     user: User = current_user
     if user.team_id:
         abort(
             HTTPStatus.BAD_REQUEST,
             message="Currently you are associated with a team, abandon it to join this team.",
         )
-    name: str = data.get("name")
+    name: str = json_data.get("name")
     team = Team(name=name)
     db.session.add(team)
     team.users.append(current_user)
@@ -72,10 +72,10 @@ def leave_team(team_id) -> ResponseReturnValue:
     }
 )
 @login_required
-def join_team(data) -> ResponseReturnValue:
+def join_team(json_data) -> ResponseReturnValue:
     if current_user.team_id:
         abort(400, message="Currently you are associated with a team, abandon it to join this team.")
-    team_code = str(data.get("code"))
+    team_code = str(json_data.get("code"))
     team: Team | None = Team.query.filter(Team.uuid == team_code).one_or_none()
     if team is None:
         abort(404)

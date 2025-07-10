@@ -43,7 +43,7 @@ def user():
         name=name,
         email=email,
         active=remember_me,
-        password=generate_password_hash(password, method="sha256"),
+        password=generate_password_hash(password),
     )
     db.session.add(user)
     db.session.commit()

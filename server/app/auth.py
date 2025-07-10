@@ -31,11 +31,11 @@ bp = APIBlueprint("auth", __name__, url_prefix="/api/auth")
 @bp.input(RegisterSchema)
 @bp.output(UserSchema, status_code=201)
 @bp.doc(responses={400: "Email already registered"})
-def register(data) -> ResponseReturnValue:
-    email: str = data["email"]
-    password: str = data["password"]
-    name: str = data["name"]
-    user = User(name=name, email=email, password=generate_password_hash(password, method="sha256"), active=True)
+def register(json_data) -> ResponseReturnValue:
+    email: str = json_data["email"]
+    password: str = json_data["password"]
+    name: str = json_data["name"]
+    user = User(name=name, email=email, password=generate_password_hash(password), active=True)
     try:
         db.session.add(user)
         db.session.commit()
@@ -50,10 +50,10 @@ def register(data) -> ResponseReturnValue:
 @bp.input(LoginSchema)
 @bp.doc(responses={400: "Invalid Credentials"})
 @bp.output(UserSchema)
-def login(data) -> ResponseReturnValue:
-    email: str = data["email"]
-    password: str = data["password"]
-    remember_me: bool = data["remember_me"]
+def login(json_data) -> ResponseReturnValue:
+    email: str = json_data["email"]
+    password: str = json_data["password"]
+    remember_me: bool = json_data["remember_me"]
     user = User.query.filter(User.email == email).first()
     if not user or not check_password_hash(user.password, password):
         abort(400, message="Please check your login details and try again.")
@@ -99,10 +99,10 @@ If you did not make this request then simply ignore this email and no changes wi
 @bp.input(ResetPasswordSchema)
 @bp.output({"message": String()})
 @bp.doc(responses=[401])
-def reset_password(data) -> ResponseReturnValue:
+def reset_password(json_data) -> ResponseReturnValue:
     if current_user.is_authenticated:
         abort(HTTPStatus.UNAUTHORIZED)
-    email: str = data["email"]
+    email: str = json_data["email"]
     user = User.query.filter(User.email == email).first()
     if user:
         send_reset_email(user)
@@ -126,13 +126,13 @@ def reset_password_token_verify(token: str) -> ResponseReturnValue:
 @bp.post("/reset-password-token/<token>")
 @bp.input(ResetPasswordTokenSchema)
 @bp.output({"message": String()})
-def reset_password_token(token, data) -> ResponseReturnValue:
+def reset_password_token(token, json_data) -> ResponseReturnValue:
     if current_user.is_authenticated:
         abort(HTTPStatus.UNAUTHORIZED)
     user = User.verify_reset_token(token)
     if user is None:
         return {"message": "That is an invalid or expired token"}
-    hashed_password = generate_password_hash(data["new_password"], method="sha256")
+    hashed_password = generate_password_hash(json_data["new_password"])
     user.password = hashed_password
     db.session.commit()
     return {"message": "Your password has been updated! You are now able to log in"}
