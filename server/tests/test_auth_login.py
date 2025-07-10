@@ -15,7 +15,7 @@ def create_user():
         name=name,
         email=email,
         active=True,
-        password=generate_password_hash(password, method="sha256"),
+        password=generate_password_hash(password),
     )
     db.session.add(user)
     db.session.commit()

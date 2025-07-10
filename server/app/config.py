@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -15,11 +15,7 @@ class Settings(BaseSettings):
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
-
-    class Config:
-        case_sensitive = True
-        env_file = "./.env.dev"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(case_sensitive=True, env_file="./.env.dev", env_file_encoding="utf-8")
 
 
 def build_database_uri(config: Settings) -> str:

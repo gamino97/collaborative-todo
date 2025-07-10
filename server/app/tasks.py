@@ -35,10 +35,10 @@ def list_tasks() -> ResponseReturnValue:
     }
 )
 @login_required
-def create_task(data) -> ResponseReturnValue:
-    title = data.get("title")
-    description = data.get("description", "")
-    team = data.get("team", False)
+def create_task(json_data) -> ResponseReturnValue:
+    title = json_data.get("title")
+    description = json_data.get("description", "")
+    team = json_data.get("team", False)
     task = Task(title=title, description=description, author=current_user)
     if team:
         if not current_user.team_id:
@@ -64,12 +64,12 @@ def verify_is_task_editable(task: Task):
 @bp.output(TaskSchema)
 @bp.doc(responses=[HTTPStatus.FORBIDDEN.value, HTTPStatus.UNAUTHORIZED.value])
 @login_required
-def update_task(task_id, data) -> ResponseReturnValue:
+def update_task(task_id, json_data) -> ResponseReturnValue:
     task: Task = db.get_or_404(Task, task_id)
     verify_is_task_editable(task)
-    title = data.get("title")
-    description = data.get("description")
-    done = data.get("done")
+    title = json_data.get("title")
+    description = json_data.get("description")
+    done = json_data.get("done")
     if task.title != title:
         task.title = title
     if task.description != description:

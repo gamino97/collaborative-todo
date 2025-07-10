@@ -62,7 +62,7 @@ def create_app(env_file=None, extra_config: dict | None = None):
     @login_manager.user_loader
     def load_user(user_id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # @app.errorhandler(HTTPException)
     # def handle_exception(e: HTTPException) -> ResponseReturnValue:
