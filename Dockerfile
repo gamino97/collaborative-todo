@@ -1,5 +1,10 @@
-FROM node:18 AS builderJs
-RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
+FROM node:20-slim AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS builderJs
 WORKDIR /app/client
 # pnpm fetch does require only lockfile
 COPY ./client/pnpm-lock.yaml ./
