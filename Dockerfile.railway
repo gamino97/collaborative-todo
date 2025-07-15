@@ -62,5 +62,4 @@ RUN chown -R app:app /app/server
 
 # change to the app user
 USER app
-# RUN python3 -m flask --app "app.main:create_app()" db upgrade
 ENTRYPOINT ["gunicorn", "-w", "2", "--bind", "0.0.0.0:5000", "app.main:create_app()"]
