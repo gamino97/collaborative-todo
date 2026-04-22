@@ -1,0 +1,27 @@
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 "app.main:create_app()"
+
+    env_file:
+      - ./server/.env.prod
+    expose:
+      - 5000
+    volumes:
+      - nginx_collaborative_static_volume:/app/server/static
+    networks:
+      - postgresql_default
+      - nginx_default
+
+volumes:
+  nginx_collaborative_static_volume:
+    external: true
+
+networks:
+  postgresql_default:
+    external: true
+  nginx_default:
+    external: true
