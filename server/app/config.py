@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
-    model_config = SettingsConfigDict(case_sensitive=True, env_file="./.env.dev", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(case_sensitive=True, env_file="./.env.dev", env_file_encoding="utf-8", secrets_dir='/run/secrets')
 
 
 def build_database_uri(config: Settings) -> str:

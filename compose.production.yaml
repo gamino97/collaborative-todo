@@ -5,9 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     command: gunicorn --bind 0.0.0.0:5000 "app.main:create_app()"
-
-    env_file:
-      - ./server/.env.prod
     expose:
       - 5000
     volumes:
@@ -15,6 +12,17 @@ services:
     networks:
       - postgresql_default
       - nginx_default
+    secrets:
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - SECRET_KEY
+      - MAIL_USERNAME
+      - MAIL_PASSWORD
+      - MAIL_DEFAULT_SENDER
+    restart: always
 
 volumes:
   nginx_collaborative_static_volume:
@@ -25,3 +33,23 @@ networks:
     external: true
   nginx_default:
     external: true
+
+secrets:
+  POSTGRES_PASSWORD:
+    file: ./secrets/POSTGRES_PASSWORD.txt
+  SECRET_KEY:
+    file: ./secrets/SECRET_KEY.txt
+  POSTGRES_HOST:
+    file: ./secrets/POSTGRES_HOST.txt
+  POSTGRES_PORT:
+    file: ./secrets/POSTGRES_PORT.txt
+  POSTGRES_DB:
+    file: ./secrets/POSTGRES_DB.txt
+  POSTGRES_USER:
+    file: ./secrets/POSTGRES_USER.txt
+  MAIL_USERNAME:
+    file: ./secrets/MAIL_USERNAME.txt
+  MAIL_PASSWORD:
+    file: ./secrets/MAIL_PASSWORD.txt
+  MAIL_DEFAULT_SENDER:
+    file: ./secrets/MAIL_DEFAULT_SENDER.txt

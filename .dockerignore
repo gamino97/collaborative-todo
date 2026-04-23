@@ -9,3 +9,4 @@ client/dist
 **/.log
 **/dist
 **/.env.*
+secrets/
