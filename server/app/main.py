@@ -8,6 +8,8 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFError, CSRFProtect, generate_csrf
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 from .config import Settings, build_database_uri
 from .database import db
@@ -85,6 +87,10 @@ def create_app(env_file=None, extra_config: dict | None = None):
             resources={r"*": {"origins": "http://dev.localhost:5173"}},
             expose_headers=["Content-Type", "X-CSRFToken"],
             supports_credentials=True,
+        )
+    else:
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
         )
 
     @app.route("/", defaults={"path": ""})

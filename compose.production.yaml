@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: gunicorn --bind 0.0.0.0:5000 "app.main:create_app()"
+    command: gunicorn "app.main:create_app()"
     expose:
       - 5000
     volumes:
